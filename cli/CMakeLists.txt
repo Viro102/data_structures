@@ -6,3 +6,8 @@ target_link_libraries(
         tests
         complexities
 )
+
+target_compile_definitions(
+        main PRIVATE
+        ANALYZER_OUTPUT="${PROJECT_SOURCE_DIR}/out"
+)

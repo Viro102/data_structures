@@ -1,7 +1,9 @@
 #include <complexities/list_analyzer.h>
 #include <tests/root.h>
 
+#ifndef ANALYZER_OUTPUT
 #define ANALYZER_OUTPUT "."
+#endif
 
 std::vector<std::unique_ptr<ds::tests::Test>> createTests() {
     auto root = std::make_unique<ds::tests::CompositeTest>("root");
