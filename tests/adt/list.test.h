@@ -96,9 +96,9 @@ template <class ListT> class ListTestAccessEnds : public LeafTest {
 
         ListT list;
 
-        this->assert_throws([&, this]() { list.accessFirst(); });
+        this->assert_throws([&list]() { list.accessFirst(); });
 
-        this->assert_throws([&, this]() { list.accessLast(); });
+        this->assert_throws([&list]() { list.accessLast(); });
 
         for (int i = 0; i < n; ++i) {
             list.insertLast(i);
@@ -126,9 +126,9 @@ template <class ListT> class ListTestAccessRandom : public LeafTest {
             list.insertLast(i);
         }
 
-        this->assert_throws([&list, this, n]() { list.access(static_cast<size_t>(n)); });
+        this->assert_throws([&list]() { list.access(static_cast<size_t>(n)); });
 
-        this->assert_throws([&list, this, n]() { list.access(static_cast<size_t>(n) + 100); });
+        this->assert_throws([&list]() { list.access(static_cast<size_t>(n) + 100); });
 
         for (int i = 0; i < n; ++i) {
             this->assert_equals(i, list.access(static_cast<size_t>(i)));
@@ -153,7 +153,7 @@ template <class ListT> class ListTestSet : public LeafTest {
             list.insertLast(i);
         }
 
-        this->assert_throws([&list, this, n]() { list.set(n, -1); });
+        this->assert_throws([&list]() { list.set(n, -1); });
 
         for (int i = 0; i < n; ++i) {
             list.set(i, static_cast<size_t>(2 * i));

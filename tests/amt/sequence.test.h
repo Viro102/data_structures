@@ -407,7 +407,7 @@ template <class SequenceT> class SequenceTestProcessBackward : public LeafTest {
 
         int processed = 0;
         seq.processBlocksBackward(seq.accessLast(),
-                                  [this, &processed, n](const amt::MemoryBlock<int> *block) {
+                                  [this, &processed](const amt::MemoryBlock<int> *block) {
                                       this->assert_equals(n - processed - 1, block->data_);
                                       ++processed;
                                   });
