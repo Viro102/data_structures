@@ -97,10 +97,7 @@ ListRemoveAnalyzer<List>::ListRemoveAnalyzer(const std::string &name) : ListAnal
 
 template <class List> void ListRemoveAnalyzer<List>::executeOperation(List &structure) {
     if (!structure.empty()) {
-        size_t index = std::min(this->getRandomIndex(), structure.size() - 1);
-        auto it = structure.begin();
-        std::advance(it, index);
-        structure.erase(it);
+        structure.erase(structure.begin());
     }
 }
 
