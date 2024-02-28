@@ -204,7 +204,7 @@ void ComplexityAnalyzer<Structure>::runReplications(Structure structurePrototype
     std::vector<size_t> capacities;
     std::vector<std::vector<duration_t>> durations;
 
-    for (int step = 0; step < getStepCount(); ++step) {
+    for (size_t step = 0; step < getStepCount(); ++step) {
         capacities.push_back((step + 1) * getStepSize());
     }
 

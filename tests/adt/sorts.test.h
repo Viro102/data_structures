@@ -53,9 +53,9 @@ class RandomIntKeyGenerator {
   public:
     RandomIntKeyGenerator(std::mt19937_64 &seeder) : rngKey_(seeder()) {}
 
-    amt::ImplicitSequence<int> operator()(std::size_t const n) {
+    amt::ImplicitSequence<int> operator()(size_t const n) {
         auto keys = amt::ImplicitSequence<int>(n, false);
-        for (auto i = 0; i < n; ++i) {
+        for (size_t i = 0; i < n; ++i) {
             keys.insertLast().data_ = distKey_(rngKey_);
         }
         return keys;

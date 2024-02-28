@@ -258,7 +258,7 @@ template <class TableT> class TableTestIterator : public details::TableTestBase<
         auto setOfKeys = std::unordered_set<int>();
         auto it1 = table.begin();
 
-        for (auto i = 0; i < table.size() / 2; ++i) {
+        for (size_t i = 0; i < table.size() / 2; ++i) {
             setOfKeys.insert((*it1).key_);
             ++it1;
         }
