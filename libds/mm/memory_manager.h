@@ -1,5 +1,6 @@
 #pragma once
 
+#include <libds/constants.h>
 #include <libds/heap_monitor.h>
 
 namespace ds::mm {
