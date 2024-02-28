@@ -13,7 +13,6 @@ template <class List> class ListAnalyzer : public ComplexityAnalyzer<List> {
   protected:
     explicit ListAnalyzer(const std::string &name);
 
-  protected:
     void growToSize(List &structure, size_t size) override;
 
     size_t getRandomIndex() const;
@@ -21,10 +20,10 @@ template <class List> class ListAnalyzer : public ComplexityAnalyzer<List> {
     int getRandomData() const;
 
   private:
-    std::default_random_engine rngData_;
-    std::default_random_engine rngIndex_;
-    size_t index_;
-    int data_;
+    std::default_random_engine rngData_{144};
+    std::default_random_engine rngIndex_{144};
+    size_t index_{0};
+    int data_{0};
 };
 
 /**
@@ -60,10 +59,9 @@ class ListsAnalyzer : public CompositeAnalyzer {
 //----------
 
 template <class List>
-ListAnalyzer<List>::ListAnalyzer(const std::string &name)
-    : ComplexityAnalyzer<List>(name), rngData_(144), rngIndex_(144), index_(0), data_(0) {
+ListAnalyzer<List>::ListAnalyzer(const std::string &name) : ComplexityAnalyzer<List>(name) {
     this->registerBeforeOperation([this](List &list) {
-        data_ = rngData_();
+        data_ = static_cast<int>(rngData_());
         std::uniform_int_distribution<size_t> indexDist(0, list.size() - 1);
         index_ = indexDist(rngIndex_);
     });
@@ -72,8 +70,10 @@ ListAnalyzer<List>::ListAnalyzer(const std::string &name)
 }
 
 template <class List> void ListAnalyzer<List>::growToSize(List &structure, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
-        structure.push_back(0);
+    size_t newSize = size - structure.size();
+
+    for (size_t i = 0; i < newSize; ++i) {
+        structure.push_back(static_cast<int>(rngData_()));
     }
 }
 

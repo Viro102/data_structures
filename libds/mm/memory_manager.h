@@ -6,7 +6,7 @@
 namespace ds::mm {
 template <typename BlockType> class MemoryManager {
   public:
-    MemoryManager();
+    MemoryManager() = default;
 
     virtual ~MemoryManager();
 
@@ -19,10 +19,8 @@ template <typename BlockType> class MemoryManager {
     size_t getAllocatedBlockCount() const;
 
   protected:
-    size_t allocatedBlockCount_;
+    size_t allocatedBlockCount_{0};
 };
-
-template <typename BlockType> MemoryManager<BlockType>::MemoryManager() : allocatedBlockCount_(0) {}
 
 template <typename BlockType> MemoryManager<BlockType>::~MemoryManager() {
     allocatedBlockCount_ = 0;
