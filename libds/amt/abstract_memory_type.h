@@ -4,8 +4,6 @@
 #include <libds/constants.h>
 #include <libds/mm/compact_memory_manager.h>
 
-#pragma warning(disable : 4250)
-
 namespace ds::amt {
 class unavailable_function_call : public std::bad_function_call {
   public:
