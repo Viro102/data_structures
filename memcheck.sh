@@ -1,3 +1,3 @@
 #! /bin/bash
 
-valgrind --leak-check=yes --show-leak-kinds=all ./build/cli/main
+valgrind --leak-check=full --show-leak-kinds=all ./build/cli/main
