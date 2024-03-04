@@ -96,12 +96,11 @@ class LeafAnalyzer : public Analyzer {
     static const size_t DEFAULT_STEP_SIZE = 10'000;
     static const size_t DEFAULT_STEP_COUNT = 10;
 
-  private:
-    std::string outputDir_;
-    size_t replicationCount_;
-    size_t stepSize_;
-    size_t stepCount_;
-    bool wasSuccessful_;
+    std::string outputDir_{"."};
+    size_t replicationCount_{DEFAULT_REPLICATION_COUNT};
+    size_t stepSize_{DEFAULT_STEP_SIZE};
+    size_t stepCount_{DEFAULT_STEP_COUNT};
+    bool wasSuccessful_{false};
 };
 
 /**
@@ -179,11 +178,9 @@ class ComplexityAnalyzer
   private:
     using duration_t = std::chrono::nanoseconds;
 
-  private:
     void saveToCsvFile(const std::vector<size_t> &sizes,
                        const std::vector<std::vector<duration_t>> &results) const;
 
-  private:
     std::function<void(Structure &)> beforeOperation_;
     std::function<void(Structure &)> afterOperation_;
 };

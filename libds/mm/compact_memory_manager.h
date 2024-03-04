@@ -210,11 +210,7 @@ void *CompactMemoryManager<BlockType>::calculateAddress(const BlockType &data) {
         p++;
     }
 
-    if (p == end_) {
-        return nullptr;
-    } else {
-        return p;
-    }
+    return p == end_ ? nullptr : p;
 }
 
 template <typename BlockType>

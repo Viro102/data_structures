@@ -50,9 +50,7 @@ const std::vector<std::unique_ptr<Analyzer>> &CompositeAnalyzer::getAnalyzers() 
 
 //----------
 
-LeafAnalyzer::LeafAnalyzer(const std::string &name)
-    : Analyzer(name), outputDir_("."), replicationCount_(DEFAULT_REPLICATION_COUNT),
-      stepSize_(DEFAULT_STEP_SIZE), stepCount_(DEFAULT_STEP_COUNT), wasSuccessful_(false) {}
+LeafAnalyzer::LeafAnalyzer(const std::string &name) : Analyzer(name) {}
 
 void LeafAnalyzer::setOutputDirectory(std::string path) { outputDir_ = std::move(path); }
 
