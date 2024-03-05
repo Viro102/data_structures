@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libds/adt/queue.h>
+#include <libs/include/adt/queue.h>
 #include <tests/_details/test.hpp>
 #include <type_traits>
 

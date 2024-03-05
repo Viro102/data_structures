@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <functional>
-#include <libds/adt/sorts.h>
-#include <libds/amt/implicit_sequence.h>
+#include <libs/include/adt/sorts.h>
+#include <libs/include/amt/implicit_sequence.h>
 #include <random>
 #include <string>
 #include <tests/_details/test.hpp>

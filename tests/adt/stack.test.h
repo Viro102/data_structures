@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libds/adt/stack.h>
+#include <libs/include/adt/stack.h>
 #include <tests/_details/test.hpp>
 
 namespace ds::tests {

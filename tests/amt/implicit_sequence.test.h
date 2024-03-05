@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libds/amt/implicit_sequence.h>
+#include <libs/include/amt/implicit_sequence.h>
 #include <memory>
 #include <tests/_details/test.hpp>
 #include <tests/amt/sequence.test.h>

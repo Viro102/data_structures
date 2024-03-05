@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libds/amt/sequence.h>
+#include <libs/include/amt/sequence.h>
 #include <memory>
 #include <tests/_details/test.hpp>
 #include <type_traits>

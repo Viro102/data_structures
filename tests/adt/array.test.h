@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libds/adt/array.h>
+#include <libs/include/adt/array.h>
 #include <tests/_details/test.hpp>
 
 namespace ds::tests {

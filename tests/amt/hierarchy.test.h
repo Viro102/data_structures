@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libds/amt/explicit_hierarchy.h>
-#include <libds/amt/implicit_hierarchy.h>
+#include <libs/include/amt/explicit_hierarchy.h>
+#include <libs/include/amt/implicit_hierarchy.h>
 #include <memory>
 #include <tests/_details/test.hpp>
 #include <vector>

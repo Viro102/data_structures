@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libds/mm/memory_manager.h>
+#include <libs/include/mm/memory_manager.h>
 #include <memory>
 #include <tests/_details/test.hpp>
 #include <vector>
