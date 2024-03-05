@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <libs/include/mm/compact_memory_manager.h>
+#include <libs/mm/compact_memory_manager.h>
 #include <memory>
 #include <tests/_details/test.hpp>
 

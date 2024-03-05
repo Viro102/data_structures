@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libs/include/adt/priority_queue.h>
+#include <libs/adt/priority_queue.h>
 #include <random>
 #include <tests/_details/test.hpp>
 #include <type_traits>

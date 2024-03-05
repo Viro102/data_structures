@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libs/include/amt/implicit_hierarchy.h>
+#include <libs/amt/implicit_hierarchy.h>
 #include <memory>
 #include <tests/_details/test.hpp>
 

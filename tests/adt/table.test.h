@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include <libs/include/adt/table.h>
+#include <libs/adt/table.h>
 #include <memory>
 #include <random>
 #include <tests/_details/test.hpp>
