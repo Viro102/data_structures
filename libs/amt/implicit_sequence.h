@@ -150,7 +150,7 @@ typename ImplicitSequence<DataType>::BlockType *
 ImplicitSequence<DataType>::accessPrevious(const BlockType &block) const {
     typename ImplicitAMS<DataType>::MemoryManagerType *memManager = this->getMemoryManager();
     size_t index = this->indexOfPrevious(memManager->calculateIndex(block));
-    return index >= 0 ? &memManager->getBlockAt(index) : nullptr;
+    return index >= 0 && index < this->size() ? &memManager->getBlockAt(index) : nullptr;
 }
 
 template <typename DataType>
