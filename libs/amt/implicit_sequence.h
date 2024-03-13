@@ -59,7 +59,6 @@ class ImplicitSequence : public Sequence<MemoryBlock<DataType>>, public Implicit
 
     virtual size_t indexOfPrevious(size_t currentIndex) const;
 
-  public:
     class ImplicitSequenceIterator {
       public:
         ImplicitSequenceIterator(ImplicitSequence<DataType> *sequence, size_t index);
@@ -126,8 +125,7 @@ typename ImplicitSequence<DataType>::BlockType *ImplicitSequence<DataType>::acce
 
 template <typename DataType>
 typename ImplicitSequence<DataType>::BlockType *ImplicitSequence<DataType>::accessLast() const {
-    size_t size = this->size();
-    return size > 0 ? &this->getMemoryManager()->getBlockAt(size - 1) : nullptr;
+    return this->size() > 0 ? &this->getMemoryManager()->getBlockAt(this->size() - 1) : nullptr;
 }
 
 template <typename DataType>
@@ -140,17 +138,16 @@ ImplicitSequence<DataType>::access(size_t index) const {
 template <typename DataType>
 typename ImplicitSequence<DataType>::BlockType *
 ImplicitSequence<DataType>::accessNext(const BlockType &block) const {
-    typename ImplicitAMS<DataType>::MemoryManagerType *memManager = this->getMemoryManager();
-    size_t index = this->indexOfNext(memManager->calculateIndex(block));
-    return index < this->size() ? &memManager->getBlockAt(index) : nullptr;
+    size_t index = this->indexOfNext(this->getMemoryManager()->calculateIndex(block));
+    return index < this->size() ? &this->getMemoryManager()->getBlockAt(index) : nullptr;
 }
 
 template <typename DataType>
 typename ImplicitSequence<DataType>::BlockType *
 ImplicitSequence<DataType>::accessPrevious(const BlockType &block) const {
-    typename ImplicitAMS<DataType>::MemoryManagerType *memManager = this->getMemoryManager();
-    size_t index = this->indexOfPrevious(memManager->calculateIndex(block));
-    return index >= 0 && index < this->size() ? &memManager->getBlockAt(index) : nullptr;
+    size_t index = this->indexOfPrevious(this->getMemoryManager()->calculateIndex(block));
+    return index >= 0 && index < this->size() ? &this->getMemoryManager()->getBlockAt(index)
+                                              : nullptr;
 }
 
 template <typename DataType>
@@ -253,12 +250,12 @@ bool ImplicitSequence<DataType>::ImplicitSequenceIterator::operator==(
 template <typename DataType>
 bool ImplicitSequence<DataType>::ImplicitSequenceIterator::operator!=(
     const ImplicitSequenceIterator &other) const {
-    return sequence_ != other.sequence_ || position_ != other.position_;
+    return this->sequence_ != other.sequence_ || this->position_ != other.position_;
 }
 
 template <typename DataType>
 DataType &ImplicitSequence<DataType>::ImplicitSequenceIterator::operator*() {
-    return sequence_->access(position_)->data_;
+    return this->sequence_->access(this->position_)->data_;
 }
 
 template <typename DataType>
