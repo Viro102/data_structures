@@ -83,7 +83,7 @@ template <typename BlockType> class Hierarchy : virtual public AMT {
         };
 
       public:
-        DepthFirstIterator(Hierarchy<BlockType> *hierarchy);
+        explicit DepthFirstIterator(Hierarchy<BlockType> *hierarchy);
 
         DepthFirstIterator(const DepthFirstIterator &other);
 
@@ -122,7 +122,7 @@ template <typename BlockType> class Hierarchy : virtual public AMT {
       public:
         PostOrderHierarchyIterator(Hierarchy<BlockType> *hierarchy, BlockType *node);
 
-        PostOrderHierarchyIterator(const PreOrderHierarchyIterator &other);
+        explicit PostOrderHierarchyIterator(const PreOrderHierarchyIterator &other);
 
         PostOrderHierarchyIterator &operator++();
     };
@@ -207,9 +207,15 @@ template <typename BlockType> class BinaryHierarchy : virtual public KWayHierarc
 //----------
 
 template <typename BlockType> size_t Hierarchy<BlockType>::level(const BlockType &node) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    int level = 0;
+    BlockType *parent = this->accessParent(node);
+
+    while (parent != nullptr) {
+        level++;
+        parent = this->accessParent(*parent);
+    }
+
+    return level;
 }
 
 template <typename BlockType> size_t Hierarchy<BlockType>::nodeCount() const {
@@ -225,45 +231,60 @@ template <typename BlockType> size_t Hierarchy<BlockType>::nodeCount(const Block
 }
 
 template <typename BlockType> bool Hierarchy<BlockType>::isRoot(const BlockType &node) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return this->accessParent(node) == nullptr;
 }
 
 template <typename BlockType>
 bool Hierarchy<BlockType>::isNthSon(const BlockType &node, size_t sonOrder) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    BlockType *parent = this->accessParent(node);
+    return parent != nullptr && this->accessSon(*parent, sonOrder) == &node;
 }
 
 template <typename BlockType> bool Hierarchy<BlockType>::isLeaf(const BlockType &node) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return degree(node) == 0;
 }
 
 template <typename BlockType>
 bool Hierarchy<BlockType>::hasNthSon(const BlockType &node, size_t sonOrder) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return this->accessSon(node, sonOrder) != nullptr;
 }
 
 template <typename BlockType>
 void Hierarchy<BlockType>::processPreOrder(const BlockType *node,
                                            std::function<void(const BlockType *)> operation) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (node != nullptr) {
+        operation(node);
+        int degree = this->degree(*node);
+        int sonOrder = 0;
+        int sonsProcessed = 0;
+
+        while (sonsProcessed < degree) {
+            if (BlockType *son = this->accessSon(*node, sonOrder); son != nullptr) {
+                this->processPreOrder(son, operation);
+                sonsProcessed++;
+            }
+            sonOrder++;
+        }
+    }
 }
 
 template <typename BlockType>
 void Hierarchy<BlockType>::processPostOrder(BlockType *node,
                                             std::function<void(BlockType *)> operation) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (node != nullptr) {
+        int degree = this->degree(*node);
+        int sonOrder = 0;
+        int sonsProcessed = 0;
+
+        while (sonsProcessed < degree) {
+            if (BlockType *son = this->accessSon(*node, sonOrder); son != nullptr) {
+                this->processPostOrder(node, operation);
+                sonsProcessed++;
+            }
+            sonOrder++;
+        }
+        operation(node);
+    }
 }
 
 template <typename BlockType>
@@ -281,8 +302,7 @@ void Hierarchy<BlockType>::processLevelOrder(BlockType *node,
                 size_t n = 0;
                 size_t sonsProcessed = 0;
                 while (sonsProcessed < nodeDegree) {
-                    BlockType *son = this->accessSon(*current, n);
-                    if (son != nullptr) {
+                    if (BlockType *son = this->accessSon(*current, n); son != nullptr) {
                         sequence.insertLast().data_ = son;
                         ++sonsProcessed;
                     }
@@ -296,9 +316,15 @@ void Hierarchy<BlockType>::processLevelOrder(BlockType *node,
 template <typename BlockType>
 void BinaryHierarchy<BlockType>::processInOrder(
     const BlockType *node, std::function<void(const BlockType *)> operation) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (node != nullptr) {
+        if (BlockType *leftSon = this->accessLeftSon(*node); leftSon != nullptr) {
+            this->processInOrder(leftSon, operation);
+        }
+        operation(node);
+        if (BlockType *rightSon = this->accessRightSon(*node); rightSon != nullptr) {
+            this->processInOrder(rightSon, operation);
+        }
+    }
 }
 
 template <typename BlockType>
@@ -411,9 +437,16 @@ Hierarchy<BlockType>::PreOrderHierarchyIterator::PreOrderHierarchyIterator(
 template <typename BlockType>
 typename Hierarchy<BlockType>::PreOrderHierarchyIterator &
 Hierarchy<BlockType>::PreOrderHierarchyIterator::operator++() {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (DepthFirstIterator::tryFindNextSonInCurrentPosition()) {
+        DepthFirstIterator::savePosition(DepthFirstIterator::currentPosition_->currentSon_);
+    } else {
+        DepthFirstIterator::removePosition();
+        if (DepthFirstIterator::currentPosition_ != nullptr) {
+            ++(*this);
+        }
+    }
+
+    return *this;
 }
 
 template <typename BlockType>
@@ -434,9 +467,18 @@ Hierarchy<BlockType>::PostOrderHierarchyIterator::PostOrderHierarchyIterator(
 template <typename BlockType>
 typename Hierarchy<BlockType>::PostOrderHierarchyIterator &
 Hierarchy<BlockType>::PostOrderHierarchyIterator::operator++() {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (DepthFirstIterator::currentPosition_->currentNodeProcessed_ &&
+        DepthFirstIterator::tryFindNextSonInCurrentPosition()) {
+        DepthFirstIterator::savePosition(DepthFirstIterator::currentPosition_->currentSon_);
+        ++(*this);
+    } else if (DepthFirstIterator::currentPosition_->currentNodeProcessed_) {
+        DepthFirstIterator::removePosition();
+        if (DepthFirstIterator::currentPosition_ != nullptr) {
+            ++(*this);
+        }
+    }
+
+    return *this;
 }
 
 template <typename BlockType>
@@ -545,9 +587,25 @@ BinaryHierarchy<BlockType>::InOrderHierarchyIterator::InOrderHierarchyIterator(
 template <typename BlockType>
 typename BinaryHierarchy<BlockType>::InOrderHierarchyIterator &
 BinaryHierarchy<BlockType>::InOrderHierarchyIterator::operator++() {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (!this->currentPosition_->currentNodeProcessed_) {
+        if (this->currentPosition_->currentSonOrder_ != LEFT_SON_INDEX &&
+            tryToGoToLeftSonInCurrentPosition()) {
+            this->savePosition(this->currentPosition_->currentSon_);
+            ++(*this);
+        }
+    } else {
+        if (this->currentPosition_->currentSonOrder_ != LEFT_SON_INDEX &&
+            tryToGoToRightSonInCurrentPosition()) {
+            this->savePosition(this->currentPosition_->currentSon_);
+            ++(*this);
+        } else {
+            this->removePosition();
+            if (this->currentPosition_ != nullptr) {
+                ++(*this);
+            }
+        }
+    }
+    return *this;
 }
 
 template <typename BlockType>

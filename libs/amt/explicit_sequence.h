@@ -142,10 +142,10 @@ template <typename BlockType> AMT &ExplicitSequence<BlockType>::assign(const AMT
     if (this != &other) {
         this->clear();
 
-        const ExplicitSequence<BlockType> &otherExplicitSequence =
+        const auto &otherExplicitSequence =
             dynamic_cast<const ExplicitSequence<BlockType> &>(other);
         otherExplicitSequence.processAllBlocksForward(
-            [&](const BlockType *b) { this->insertLast().data_ = b->data_; });
+            [this](const BlockType *b) { this->insertLast().data_ = b->data_; });
     }
 
     return *this;
@@ -170,8 +170,7 @@ template <typename BlockType> bool ExplicitSequence<BlockType>::equals(const AMT
         return false;
     }
 
-    const ExplicitSequence<BlockType> *otherExplicitSequence =
-        dynamic_cast<const ExplicitSequence<BlockType> *>(&other);
+    const auto *otherExplicitSequence = dynamic_cast<const ExplicitSequence<BlockType> *>(&other);
     if (otherExplicitSequence == nullptr) {
         return false;
     }
@@ -193,7 +192,7 @@ template <typename BlockType> bool ExplicitSequence<BlockType>::equals(const AMT
 
 template <typename BlockType> size_t ExplicitSequence<BlockType>::calculateIndex(BlockType &data) {
     size_t result = 0;
-    BlockType *block = this->findBlockWithProperty([&](BlockType *b) {
+    BlockType *block = this->findBlockWithProperty([&data, &result](BlockType *b) {
         result++;
         return &data == b;
     });
@@ -228,7 +227,7 @@ BlockType *ExplicitSequence<BlockType>::accessNext(const BlockType &block) const
 
 template <typename BlockType>
 BlockType *ExplicitSequence<BlockType>::accessPrevious(const BlockType &block) const {
-    return this->findBlockWithProperty([&](BlockType *b) { return b->next_ == &block; });
+    return this->findBlockWithProperty([&block](BlockType *b) { return b->next_ == &block; });
 }
 
 template <typename BlockType> BlockType &ExplicitSequence<BlockType>::insertFirst() {

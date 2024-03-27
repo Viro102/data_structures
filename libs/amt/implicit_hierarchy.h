@@ -1,6 +1,7 @@
 #pragma once
 
 #include "abstract_memory_type.h"
+#include "constants.h"
 #include "hierarchy.h"
 #include <cmath>
 
@@ -85,9 +86,7 @@ size_t ImplicitHierarchy<DataType, K>::level(const MemoryBlock<DataType> &node) 
 
 template <typename DataType, size_t K>
 size_t ImplicitHierarchy<DataType, K>::level(size_t index) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return floor(log((K - 1) * (index + 1)) / log(K));
 }
 
 template <typename DataType, size_t K>
@@ -97,9 +96,25 @@ size_t ImplicitHierarchy<DataType, K>::degree(const MemoryBlock<DataType> &node)
 
 template <typename DataType, size_t K>
 size_t ImplicitHierarchy<DataType, K>::degree(size_t index) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    int currentLevel = this->level(index);
+    int indexOfPrevious = this->size() - 1;
+    int depth = this->level(indexOfPrevious);
+
+    if (currentLevel == depth) {
+        return 0;
+    } else if (currentLevel == depth - 1) {
+        int indexOfPreviousParent = this->indexOfParent(indexOfPrevious);
+        if (index < indexOfPreviousParent) {
+            return K;
+        } else if (index > indexOfPreviousParent) {
+            return 0;
+        } else {
+            int mod = (this->size() - 1) % K;
+            return mod == 0 ? K : mod;
+        }
+    } else {
+        return K;
+    }
 }
 
 template <typename DataType, size_t K>
@@ -111,32 +126,34 @@ size_t ImplicitHierarchy<DataType, K>::nodeCount(const MemoryBlock<DataType> &no
 
 template <typename DataType, size_t K>
 MemoryBlock<DataType> *ImplicitHierarchy<DataType, K>::accessRoot() const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (this->size() > 0) {
+        return &this->getMemoryManager()->getBlockAt(0);
+    } else {
+        return nullptr;
+    }
 }
 
 template <typename DataType, size_t K>
 MemoryBlock<DataType> *
 ImplicitHierarchy<DataType, K>::accessParent(const MemoryBlock<DataType> &node) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    int index = this->indexOfParent(node);
+
+    return INVALID_INDEX != index ? &this->getMemoryManager()->getBlockAt(index) : nullptr;
 }
 
 template <typename DataType, size_t K>
 MemoryBlock<DataType> *ImplicitHierarchy<DataType, K>::accessSon(const MemoryBlock<DataType> &node,
                                                                  size_t sonOrder) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    int index = this->indexOfSon(node, sonOrder);
+
+    return index < this->size() ? &this->getMemoryManager()->getBlockAt(index) : nullptr;
 }
 
 template <typename DataType, size_t K>
 MemoryBlock<DataType> *ImplicitHierarchy<DataType, K>::accessLastLeaf() const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    int size = this->size();
+
+    return size != 0 ? &this->getMemoryManager()->getBlockAt(size - 1) : nullptr;
 }
 
 template <typename DataType, size_t K>
@@ -168,15 +185,11 @@ void ImplicitHierarchy<DataType, K>::removeSon(MemoryBlock<DataType> &parent, si
 
 template <typename DataType, size_t K>
 MemoryBlock<DataType> &ImplicitHierarchy<DataType, K>::insertLastLeaf() {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return *(this->getMemoryManager()->allocateMemory());
 }
 
 template <typename DataType, size_t K> void ImplicitHierarchy<DataType, K>::removeLastLeaf() {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return this->getMemoryManager()->releaseMemory();
 }
 
 template <typename DataType, size_t K>
@@ -186,9 +199,7 @@ size_t ImplicitHierarchy<DataType, K>::indexOfParent(const MemoryBlock<DataType>
 
 template <typename DataType, size_t K>
 size_t ImplicitHierarchy<DataType, K>::indexOfParent(size_t index) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return 0 == index ? INVALID_INDEX : (index - 1) / K;
 }
 
 template <typename DataType, size_t K>
@@ -199,8 +210,6 @@ size_t ImplicitHierarchy<DataType, K>::indexOfSon(const MemoryBlock<DataType> &n
 
 template <typename DataType, size_t K>
 size_t ImplicitHierarchy<DataType, K>::indexOfSon(size_t indexOfParent, size_t sonOrder) const {
-    // TODO 05
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return K * indexOfParent + sonOrder + 1;
 }
 } // namespace ds::amt
