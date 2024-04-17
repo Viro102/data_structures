@@ -2,6 +2,7 @@
 
 #include "abstract_memory_type.h"
 #include "explicit_sequence.h"
+#include <cstddef>
 #include <functional>
 
 namespace ds::amt {
@@ -207,7 +208,7 @@ template <typename BlockType> class BinaryHierarchy : virtual public KWayHierarc
 //----------
 
 template <typename BlockType> size_t Hierarchy<BlockType>::level(const BlockType &node) const {
-    int level = 0;
+    size_t level = 0;
     BlockType *parent = this->accessParent(node);
 
     while (parent != nullptr) {
@@ -241,7 +242,7 @@ bool Hierarchy<BlockType>::isNthSon(const BlockType &node, size_t sonOrder) cons
 }
 
 template <typename BlockType> bool Hierarchy<BlockType>::isLeaf(const BlockType &node) const {
-    return degree(node) == 0;
+    return this->degree(node) == 0;
 }
 
 template <typename BlockType>
@@ -254,16 +255,16 @@ void Hierarchy<BlockType>::processPreOrder(const BlockType *node,
                                            std::function<void(const BlockType *)> operation) const {
     if (node != nullptr) {
         operation(node);
-        int degree = this->degree(*node);
-        int sonOrder = 0;
-        int sonsProcessed = 0;
+        size_t degree = this->degree(*node);
+        size_t sonOrder = 0;
+        size_t sonsProcessed = 0;
 
         while (sonsProcessed < degree) {
             if (BlockType *son = this->accessSon(*node, sonOrder); son != nullptr) {
                 this->processPreOrder(son, operation);
-                sonsProcessed++;
+                ++sonsProcessed;
             }
-            sonOrder++;
+            ++sonOrder;
         }
     }
 }
@@ -272,16 +273,16 @@ template <typename BlockType>
 void Hierarchy<BlockType>::processPostOrder(BlockType *node,
                                             std::function<void(BlockType *)> operation) const {
     if (node != nullptr) {
-        int degree = this->degree(*node);
-        int sonOrder = 0;
-        int sonsProcessed = 0;
+        size_t degree = this->degree(*node);
+        size_t sonOrder = 0;
+        size_t sonsProcessed = 0;
 
         while (sonsProcessed < degree) {
             if (BlockType *son = this->accessSon(*node, sonOrder); son != nullptr) {
-                this->processPostOrder(node, operation);
-                sonsProcessed++;
+                this->processPostOrder(son, operation);
+                ++sonsProcessed;
             }
-            sonOrder++;
+            ++sonOrder;
         }
         operation(node);
     }
@@ -437,11 +438,11 @@ Hierarchy<BlockType>::PreOrderHierarchyIterator::PreOrderHierarchyIterator(
 template <typename BlockType>
 typename Hierarchy<BlockType>::PreOrderHierarchyIterator &
 Hierarchy<BlockType>::PreOrderHierarchyIterator::operator++() {
-    if (DepthFirstIterator::tryFindNextSonInCurrentPosition()) {
-        DepthFirstIterator::savePosition(DepthFirstIterator::currentPosition_->currentSon_);
+    if (this->tryFindNextSonInCurrentPosition()) {
+        this->savePosition(this->currentPosition_->currentSon_);
     } else {
-        DepthFirstIterator::removePosition();
-        if (DepthFirstIterator::currentPosition_ != nullptr) {
+        this->removePosition();
+        if (this->currentPosition_ != nullptr) {
             ++(*this);
         }
     }
@@ -467,14 +468,15 @@ Hierarchy<BlockType>::PostOrderHierarchyIterator::PostOrderHierarchyIterator(
 template <typename BlockType>
 typename Hierarchy<BlockType>::PostOrderHierarchyIterator &
 Hierarchy<BlockType>::PostOrderHierarchyIterator::operator++() {
-    if (DepthFirstIterator::currentPosition_->currentNodeProcessed_ &&
-        DepthFirstIterator::tryFindNextSonInCurrentPosition()) {
-        DepthFirstIterator::savePosition(DepthFirstIterator::currentPosition_->currentSon_);
+    if (!this->currentPosition_->currentNodeProcessed_ && this->tryFindNextSonInCurrentPosition()) {
+        this->savePosition(this->currentPosition_->currentSon_);
         ++(*this);
-    } else if (DepthFirstIterator::currentPosition_->currentNodeProcessed_) {
-        DepthFirstIterator::removePosition();
-        if (DepthFirstIterator::currentPosition_ != nullptr) {
-            ++(*this);
+    } else {
+        if (this->currentPosition_->currentNodeProcessed_) {
+            this->removePosition();
+            if (this->currentPosition_ != nullptr) {
+                ++(*this);
+            }
         }
     }
 
@@ -589,13 +591,13 @@ typename BinaryHierarchy<BlockType>::InOrderHierarchyIterator &
 BinaryHierarchy<BlockType>::InOrderHierarchyIterator::operator++() {
     if (!this->currentPosition_->currentNodeProcessed_) {
         if (this->currentPosition_->currentSonOrder_ != LEFT_SON_INDEX &&
-            tryToGoToLeftSonInCurrentPosition()) {
+            this->tryToGoToLeftSonInCurrentPosition()) {
             this->savePosition(this->currentPosition_->currentSon_);
             ++(*this);
         }
     } else {
-        if (this->currentPosition_->currentSonOrder_ != LEFT_SON_INDEX &&
-            tryToGoToRightSonInCurrentPosition()) {
+        if (this->currentPosition_->currentSonOrder_ != RIGHT_SON_INDEX &&
+            this->tryToGoToRightSonInCurrentPosition()) {
             this->savePosition(this->currentPosition_->currentSon_);
             ++(*this);
         } else {
