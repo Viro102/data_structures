@@ -1,7 +1,7 @@
 #pragma once
 
-#include <libs/amt/abstract_memory_type.h>
-#include <libs/amt/sequence.h>
+#include "abstract_memory_type.h"
+#include "sequence.h"
 
 namespace ds::amt {
 
