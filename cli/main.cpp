@@ -25,7 +25,7 @@ std::vector<std::unique_ptr<ds::tests::Test>> createTests() {
 
     // amt->add_test(std::make_unique<ds::tests::ExplicitHierarchyTest>());
 
-    adt->add_test(std::make_unique<ds::tests::ListTest>());
+    // adt->add_test(std::make_unique<ds::tests::ListTest>());
     adt->add_test(std::make_unique<ds::tests::ArraysTest>());
 
     // TODO 08

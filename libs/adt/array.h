@@ -212,9 +212,9 @@ template <typename T> ADT &CompactMatrix<T>::assign(const ADT &other) {
     }
 
     if (dimension1_ != otherMatrix->dimension1_ || dimension2_ != otherMatrix->dimension2_) {
-        throw std::logic_error("CompactMatrix dimensions are different!");
+        throw structure_error("CompactMatrix dimensions are different!");
     }
-    ADS<T>::assign(*otherMatrix);
+    ADS<T>::assign(other);
     return *this;
 }
 
