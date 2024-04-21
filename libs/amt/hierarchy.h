@@ -96,6 +96,10 @@ template <typename BlockType> class Hierarchy : virtual public AMT {
 
         DataType &operator*();
 
+        using value_type = DataType;
+        using pointer = DataType *;
+        using reference = DataType &;
+
       protected:
         void savePosition(BlockType *currentNode);
 
