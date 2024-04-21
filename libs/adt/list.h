@@ -38,7 +38,6 @@ template <typename T, typename SequenceType> class GeneralList : public List<T>,
   public:
     using IteratorType = typename SequenceType::IteratorType;
 
-  public:
     GeneralList();
 
     GeneralList(const GeneralList &other);
@@ -110,9 +109,18 @@ GeneralList<T, SequenceType>::GeneralList(const GeneralList &other)
 
 template <typename T, typename SequenceType>
 size_t GeneralList<T, SequenceType>::calculateIndex(T element) {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    size_t result = 0;
+    auto *block = this->getSequence()->findBlockWithProperty(
+        [&element, &result](SequenceType::BlockType *block) {
+            if (block->data_ == element) {
+                return true;
+            } else {
+                ++result;
+                return false;
+            }
+        });
+
+    return block != nullptr ? result : INVALID_INDEX;
 }
 
 template <typename T, typename SequenceType>
@@ -121,82 +129,89 @@ bool GeneralList<T, SequenceType>::contains(T element) {
 }
 
 template <typename T, typename SequenceType> T GeneralList<T, SequenceType>::accessFirst() {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (this->isEmpty()) {
+        throw structure_error("List is empty!");
+    } else {
+        return this->getSequence()->accessFirst()->data_;
+    }
 }
 
 template <typename T, typename SequenceType> T GeneralList<T, SequenceType>::accessLast() {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (this->isEmpty()) {
+        throw structure_error("List is empty!");
+    } else {
+        return this->getSequence()->accessLast()->data_;
+    }
 }
 
 template <typename T, typename SequenceType> T GeneralList<T, SequenceType>::access(size_t index) {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (index >= this->getSequence()->size()) {
+        throw structure_error("Index out of bounds!");
+    }
+    return this->getSequence()->access(index)->data_;
 }
 
 template <typename T, typename SequenceType>
 void GeneralList<T, SequenceType>::insertFirst(T element) {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    this->getSequence()->insertFirst().data_ = element;
 }
 
 template <typename T, typename SequenceType>
 void GeneralList<T, SequenceType>::insertLast(T element) {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    this->getSequence()->insertLast().data_ = element;
 }
 
 template <typename T, typename SequenceType>
 void GeneralList<T, SequenceType>::insert(T element, size_t index) {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (index <= this->getSequence()->size()) {
+        this->getSequence()->insert(index).data_ = element;
+    } else {
+        throw structure_error("Index out of bounds!");
+    }
 }
 
 template <typename T, typename SequenceType>
 void GeneralList<T, SequenceType>::set(size_t index, T element) {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (index < this->getSequence()->size()) {
+        this->getSequence()->access(index)->data_ = element;
+    } else {
+        throw structure_error("Index out of bounds!");
+    }
 }
 
 template <typename T, typename SequenceType> void GeneralList<T, SequenceType>::removeFirst() {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (this->isEmpty()) {
+        throw structure_error("List is empty!");
+    } else {
+        this->getSequence()->removeFirst();
+    }
 }
 
 template <typename T, typename SequenceType> void GeneralList<T, SequenceType>::removeLast() {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (this->isEmpty()) {
+        throw structure_error("List is empty!");
+    } else {
+        this->getSequence()->removeLast();
+    }
 }
 
 template <typename T, typename SequenceType>
 void GeneralList<T, SequenceType>::remove(size_t index) {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (this->isEmpty()) {
+        throw structure_error("List is empty!");
+    } else {
+        this->getSequence()->remove(index);
+    }
 }
 
 template <typename T, typename SequenceType>
 auto GeneralList<T, SequenceType>::begin() -> IteratorType {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return this->getSequence()->begin();
 }
 
 template <typename T, typename SequenceType>
 auto GeneralList<T, SequenceType>::end() -> IteratorType {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return this->getSequence()->end();
 }
 
 template <typename T, typename SequenceType>

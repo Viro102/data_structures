@@ -135,7 +135,7 @@ class MWEHTestRemove : public LeafTest {
         //   x         ~
         auto &root = *hierarchy.accessRoot();
         auto &one = *hierarchy.accessSon(root, 0);
-        auto &two = *hierarchy.accessSon(root, 1);
+        // auto &two = *hierarchy.accessSon(root, 1);
 
         hierarchy.removeSon(one, 1);
         hierarchy.removeSon(root, 1);

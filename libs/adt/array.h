@@ -27,7 +27,6 @@ template <typename T> class Array : public ADS<T> {
   public:
     using IteratorType = typename amt::IS<T>::IteratorType;
 
-  public:
     Array(size_t size);
 
     Array(Dimension dimension);
@@ -61,7 +60,6 @@ template <typename T> class Array : public ADS<T> {
 
     amt::IS<T> *getSequence() const;
 
-  private:
     long long base_;
 };
 
@@ -109,7 +107,6 @@ template <typename T> class CompactMatrix : public Matrix<T>, public ADS<T> {
 
     amt::IS<T> *getSequence() const;
 
-  private:
     Dimension dimension1_;
     Dimension dimension2_;
 };
@@ -140,9 +137,15 @@ template <typename T>
 Array<T>::Array(const Array<T> &other) : ADS<T>(new amt::IS<T>(), other), base_(other.base_) {}
 
 template <typename T> ADT &Array<T>::assign(const ADT &other) {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    const Array<T> *otherArray = dynamic_cast<const Array<T> *>(&other);
+    if (otherArray == nullptr) {
+        throw structure_error("Abstract data types are different!");
+    }
+    if (base_ != otherArray->base_ || this->size() != other.size()) {
+        throw structure_error("Array dimensions are different!");
+    }
+    ADS<T>::assign(other);
+    return *this;
 }
 
 template <typename T> void Array<T>::clear() { throw std::logic_error("Array can't be cleared!"); }
@@ -152,55 +155,39 @@ template <typename T> bool Array<T>::equals(const ADT &other) {
     return otherArray != nullptr && base_ == otherArray->base_ && ADS<T>::equals(other);
 }
 
-template <typename T> bool Array<T>::isEmpty() const {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
-}
+template <typename T> bool Array<T>::isEmpty() const { return false; }
 
 template <typename T> size_t Array<T>::size() const { return this->getSequence()->size(); }
 
 template <typename T> long long Array<T>::getBase() const { return base_; }
 
 template <typename T> T Array<T>::access(long long index) const {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (validateIndex(index)) {
+        throw structure_error("Invalid index!");
+    }
+    return this->getSequence()->access(mapIndex(index))->data_;
 }
 
 template <typename T> void Array<T>::set(T element, long long index) {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (validateIndex(index)) {
+        throw structure_error("Invalid index!");
+    }
+    this->getSequence()->access(mapIndex(index))->data_ = element;
 }
 
-template <typename T> auto Array<T>::begin() -> IteratorType {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
-}
+template <typename T> auto Array<T>::begin() -> IteratorType { this->getSequence()->begin(); }
 
-template <typename T> auto Array<T>::end() -> IteratorType {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
-}
+template <typename T> auto Array<T>::end() -> IteratorType { this->getSequence()->end(); }
 
 template <typename T> amt::IS<T> *Array<T>::getSequence() const {
     return dynamic_cast<amt::IS<T> *>(this->memoryStructure_);
 }
 
 template <typename T> bool Array<T>::validateIndex(long long index) const {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return index >= base_ && index < base_ + static_cast<long long>(this->size());
 }
 
-template <typename T> size_t Array<T>::mapIndex(long long index) const {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
-}
+template <typename T> size_t Array<T>::mapIndex(long long index) const { return index - base_; }
 
 //----------
 
@@ -248,29 +235,33 @@ template <typename T> Dimension CompactMatrix<T>::getDimension1() const { return
 template <typename T> Dimension CompactMatrix<T>::getDimension2() const { return dimension2_; }
 
 template <typename T> T CompactMatrix<T>::access(long long index1, long long index2) const {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (validateIndices(index1, index2)) {
+        throw structure_error("Invalid indices!");
+    }
+    size_t mappedIndex = mapIndices(index1, index2);
+    return this->getSequence()->access(mappedIndex)->data_;
 }
 
 template <typename T> void CompactMatrix<T>::set(T element, long long index1, long long index2) {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (validateIndices(index1, index2)) {
+        throw structure_error("Invalid indices!");
+    }
+    size_t mappedIndex = mapIndices(index1, index2);
+    this->getSequence()->access(mappedIndex)->data_ = element;
 }
 
 template <typename T>
 bool CompactMatrix<T>::validateIndices(long long index1, long long index2) const {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return index1 >= dimension1_.getBase() &&
+           index1 < dimension1_.getBase() + dimension1_.getSize() &&
+           index2 >= dimension2_.getBase() &&
+           index2 < dimension2_.getBase() + dimension2_.getSize();
 }
 
 template <typename T>
 size_t CompactMatrix<T>::mapIndices(long long index1, long long index2) const {
-    // TODO 08
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    return (index1 - dimension1_.getBase()) * dimension2_.getSize() +
+           (index2 - dimension2_.getBase());
 }
 
 template <typename T> amt::IS<T> *CompactMatrix<T>::getSequence() const {
