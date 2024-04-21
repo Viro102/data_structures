@@ -162,14 +162,14 @@ template <typename T> size_t Array<T>::size() const { return this->getSequence()
 template <typename T> long long Array<T>::getBase() const { return base_; }
 
 template <typename T> T Array<T>::access(long long index) const {
-    if (validateIndex(index)) {
+    if (!validateIndex(index)) {
         throw structure_error("Invalid index!");
     }
     return this->getSequence()->access(mapIndex(index))->data_;
 }
 
 template <typename T> void Array<T>::set(T element, long long index) {
-    if (validateIndex(index)) {
+    if (!validateIndex(index)) {
         throw structure_error("Invalid index!");
     }
     this->getSequence()->access(mapIndex(index))->data_ = element;
@@ -206,11 +206,15 @@ CompactMatrix<T>::CompactMatrix(const CompactMatrix<T> &other)
       dimension2_(other.dimension2_) {}
 
 template <typename T> ADT &CompactMatrix<T>::assign(const ADT &other) {
-    const CompactMatrix<T> &otherMatrix = dynamic_cast<const CompactMatrix<T> &>(other);
-    if (dimension1_ != otherMatrix.dimension1_ || dimension2_ != otherMatrix.dimension2_) {
+    const CompactMatrix<T> *otherMatrix = dynamic_cast<const CompactMatrix<T> *>(&other);
+    if (otherMatrix == nullptr) {
+        throw structure_error("Abstract data types are different!");
+    }
+
+    if (dimension1_ != otherMatrix->dimension1_ || dimension2_ != otherMatrix->dimension2_) {
         throw std::logic_error("CompactMatrix dimensions are different!");
     }
-    ADS<T>::assign(otherMatrix);
+    ADS<T>::assign(*otherMatrix);
     return *this;
 }
 
@@ -220,8 +224,12 @@ template <typename T> void CompactMatrix<T>::clear() {
 
 template <typename T> bool CompactMatrix<T>::equals(const ADT &other) {
     const CompactMatrix<T> *otherMatrix = dynamic_cast<const CompactMatrix<T> *>(&other);
-    return otherMatrix != nullptr && dimension1_ == otherMatrix->dimension1_ &&
-           dimension2_ == otherMatrix->dimension2_ && ADS<T>::equals(other);
+    if (otherMatrix == nullptr) {
+        return false;
+    }
+
+    return dimension1_ == otherMatrix->dimension1_ && dimension2_ == otherMatrix->dimension2_ &&
+           ADS<T>::equals(other);
 }
 
 template <typename T> bool CompactMatrix<T>::isEmpty() const { return false; }
@@ -235,7 +243,7 @@ template <typename T> Dimension CompactMatrix<T>::getDimension1() const { return
 template <typename T> Dimension CompactMatrix<T>::getDimension2() const { return dimension2_; }
 
 template <typename T> T CompactMatrix<T>::access(long long index1, long long index2) const {
-    if (validateIndices(index1, index2)) {
+    if (!validateIndices(index1, index2)) {
         throw structure_error("Invalid indices!");
     }
     size_t mappedIndex = mapIndices(index1, index2);
@@ -243,7 +251,7 @@ template <typename T> T CompactMatrix<T>::access(long long index1, long long ind
 }
 
 template <typename T> void CompactMatrix<T>::set(T element, long long index1, long long index2) {
-    if (validateIndices(index1, index2)) {
+    if (!validateIndices(index1, index2)) {
         throw structure_error("Invalid indices!");
     }
     size_t mappedIndex = mapIndices(index1, index2);
