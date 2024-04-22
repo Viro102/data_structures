@@ -261,9 +261,9 @@ template <typename T> void CompactMatrix<T>::set(T element, long long index1, lo
 template <typename T>
 bool CompactMatrix<T>::validateIndices(long long index1, long long index2) const {
     return index1 >= dimension1_.getBase() &&
-           index1 < dimension1_.getBase() + dimension1_.getSize() &&
+           index1 < dimension1_.getBase() + static_cast<long long>(dimension1_.getSize()) &&
            index2 >= dimension2_.getBase() &&
-           index2 < dimension2_.getBase() + dimension2_.getSize();
+           index2 < dimension2_.getBase() + static_cast<long long>(dimension2_.getSize());
 }
 
 template <typename T>
