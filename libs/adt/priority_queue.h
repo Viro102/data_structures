@@ -426,10 +426,10 @@ template <typename P, typename T> void TwoLists<P, T>::push(P priority, T data) 
 
         if (shortSequence_->size() == shortSequence_->getCapacity()) {
             ShortSequenceBlockType *shortBlock = shortSequence_->accessFirst();
-            LongSequenceBlockType longBlock = longSequence_->insertLast();
+            LongSequenceBlockType *longBlock = &longSequence_->insertLast();
 
-            longBlock.data_.priority_ = shortBlock->data_.priority_;
-            longBlock.data_.data_ = shortBlock->data_.data_;
+            longBlock->data_.priority_ = shortBlock->data_.priority_;
+            longBlock->data_.data_ = shortBlock->data_.data_;
 
             shortSequence_->removeFirst();
         }
