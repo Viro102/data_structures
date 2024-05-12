@@ -30,12 +30,11 @@ std::vector<std::unique_ptr<ds::tests::Test>> createTests() {
 
     // adt->add_test(std::make_unique<ds::tests::StackTest>());
     // adt->add_test(std::make_unique<ds::tests::QueueTest>());
-    adt->add_test(std::make_unique<ds::tests::PriorityQueueTest>());
+    // adt->add_test(std::make_unique<ds::tests::PriorityQueueTest>());
 
     // adt->add_test(std::make_unique<ds::tests::SequenceTableTest>());
 
-    // FIXME
-    // adt->add_test(std::make_unique<ds::tests::NonSequenceTableTest>());
+    adt->add_test(std::make_unique<ds::tests::NonSequenceTableTest>());
 
     // FIXME
     // adt->add_test(std::make_unique<ds::tests::SortTest>());

@@ -568,9 +568,16 @@ template <typename K, typename T> ADT &HashTable<K, T>::assign(const ADT &other)
 }
 
 template <typename K, typename T> bool HashTable<K, T>::equals(const ADT &other) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    auto *otherHashTable = dynamic_cast<const HashTable<K, T> *>(&other);
+    if (otherHashTable == nullptr) {
+        return false;
+    }
+
+    if (this->size() != otherHashTable->size()) {
+        return false;
+    }
+
+    return this->areEqual(*this, *otherHashTable);
 }
 
 template <typename K, typename T> void HashTable<K, T>::clear() {
@@ -589,21 +596,18 @@ template <typename K, typename T> bool HashTable<K, T>::isEmpty() const {
 }
 
 template <typename K, typename T> void HashTable<K, T>::insert(const K &key, T data) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    // TODO: Implement
+    throw std::runtime_error("Not implemented");
 }
 
 template <typename K, typename T> bool HashTable<K, T>::tryFind(const K &key, T *&data) const {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    // TODO: Implement
+    throw std::runtime_error("Not implemented");
 }
 
 template <typename K, typename T> T HashTable<K, T>::remove(const K &key) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    // TODO: Implement
+    throw std::runtime_error("Not implemented");
 }
 
 template <typename K, typename T>
@@ -634,9 +638,8 @@ template <typename K, typename T> HashTable<K, T>::HashTableIterator::~HashTable
 
 template <typename K, typename T>
 typename HashTable<K, T>::HashTableIterator &HashTable<K, T>::HashTableIterator::operator++() {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    // TODO: Implement
+    throw std::runtime_error("Not implemented");
 }
 
 template <typename K, typename T>
@@ -703,23 +706,51 @@ void GeneralBinarySearchTree<K, T, ItemType>::clear() {
 
 template <typename K, typename T, typename ItemType>
 void GeneralBinarySearchTree<K, T, ItemType>::insert(const K &key, T data) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    BSTNodeType *newNode = nullptr;
+
+    if (this->isEmpty()) {
+        newNode = &this->getHierarchy()->emplaceRoot();
+    } else {
+        BSTNodeType *parent = nullptr;
+        if (tryFindNodeWithKey(key, parent)) {
+            throw std::runtime_error("Table already contains an item with the given key!");
+        }
+        if (key > parent->data_.key_) {
+            newNode = &this->getHierarchy()->insertRightSon(*parent);
+        } else {
+            newNode = &this->getHierarchy()->insertLeftSon(*parent);
+        }
+    }
+
+    newNode->data_.key_ = key;
+    newNode->data_.data_ = data;
+    ++size_;
+    balanceTree(newNode);
 }
 
 template <typename K, typename T, typename ItemType>
 bool GeneralBinarySearchTree<K, T, ItemType>::tryFind(const K &key, T *&data) const {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    BSTNodeType *nodeWithKey = nullptr;
+    if (!tryFindNodeWithKey(key, nodeWithKey)) {
+        return false;
+    }
+
+    data = &nodeWithKey->data_.data_;
+    return true;
 }
 
 template <typename K, typename T, typename ItemType>
 T GeneralBinarySearchTree<K, T, ItemType>::remove(const K &key) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    BSTNodeType *nodeWithKey = nullptr;
+
+    if (!tryFindNodeWithKey(key, nodeWithKey)) {
+        throw std::out_of_range("No such key!");
+    }
+
+    T result = nodeWithKey->data_.data_;
+    removeNode(nodeWithKey);
+    --size_;
+    return result;
 }
 
 template <typename K, typename T, typename ItemType>
@@ -741,39 +772,138 @@ amt::BinaryEH<ItemType> *GeneralBinarySearchTree<K, T, ItemType>::getHierarchy()
 
 template <typename K, typename T, typename ItemType>
 void GeneralBinarySearchTree<K, T, ItemType>::removeNode(BSTNodeType *node) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    BSTNodeType *parent = static_cast<BSTNodeType *>(node->parent_);
+
+    switch (this->getHierarchy()->degree(*node)) {
+    case 0: {
+        if (this->getHierarchy()->isRoot(*node)) {
+            this->getHierarchy()->clear();
+        } else {
+            if (this->getHierarchy()->isLeftSon(*node)) {
+                this->getHierarchy()->removeLeftSon(*parent);
+            } else {
+                this->getHierarchy()->removeRightSon(*parent);
+            }
+        }
+        break;
+    }
+    case 1: {
+        BSTNodeType *son = this->getHierarchy()->hasLeftSon(*node) ? node->left_ : node->right_;
+        if (node->left_ == son) {
+            this->getHierarchy()->changeLeftSon(*node, nullptr);
+        } else {
+            this->getHierarchy()->changeRightSon(*node, nullptr);
+        }
+        if (this->getHierarchy()->isRoot(*node)) {
+            this->getHierarchy()->clear();
+            this->getHierarchy()->changeRoot(son);
+        } else {
+            if (parent->left_ == node) {
+                this->getHierarchy()->removeLeftSon(*parent);
+                this->getHierarchy()->changeLeftSon(*parent, son);
+            } else {
+                this->getHierarchy()->removeRightSon(*parent);
+                this->getHierarchy()->changeRightSon(*parent, son);
+            }
+        }
+        break;
+    }
+    case 2: {
+        BSTNodeType *inorderPredecessor = node->left_;
+        while (this->getHierarchy()->hasRightSon(*inorderPredecessor)) {
+            inorderPredecessor = inorderPredecessor->right_;
+        }
+        std::swap(node->data_, inorderPredecessor->data_);
+        removeNode(inorderPredecessor);
+        break;
+    }
+    }
 }
 
 template <typename K, typename T, typename ItemType>
 bool GeneralBinarySearchTree<K, T, ItemType>::tryFindNodeWithKey(const K &key,
                                                                  BSTNodeType *&node) const {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    if (this->isEmpty()) {
+        return false;
+    }
+
+    node = this->getHierarchy()->accessRoot();
+
+    while (node->data_.key_ != key && !this->getHierarchy()->isLeaf(*node)) {
+        if (key < node->data_.key_) {
+            if (node->left_ != nullptr) {
+                node = node->left_;
+            } else {
+                return false;
+            }
+        } else {
+            if (node->right_ != nullptr) {
+                node = node->right_;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    return node->data_.key_ == key;
 }
 
 template <typename K, typename T, typename ItemType>
 void GeneralBinarySearchTree<K, T, ItemType>::rotateLeft(BSTNodeType *node) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    BSTNodeType *leftSon = node->left_;
+    BSTNodeType *parent = static_cast<BSTNodeType *>(node->parent_);
+    BSTNodeType *grandParent = static_cast<BSTNodeType *>(parent->parent_);
+
+    this->getHierarchy()->changeRightSon(*parent, nullptr);
+    this->getHierarchy()->changeLeftSon(*node, nullptr);
+
+    if (grandParent != nullptr) {
+        if (grandParent->left_ == parent) {
+            this->getHierarchy()->changeLeftSon(*grandParent, node);
+        } else {
+            this->getHierarchy()->changeRightSon(*grandParent, node);
+        }
+    } else {
+        this->getHierarchy()->changeRoot(node);
+    }
+
+    this->getHierarchy()->changeRightSon(*parent, leftSon);
+    this->getHierarchy()->changeLeftSon(*node, parent);
 }
 
 template <typename K, typename T, typename ItemType>
 void GeneralBinarySearchTree<K, T, ItemType>::rotateRight(BSTNodeType *node) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    BSTNodeType *rightSon = node->right_;
+    BSTNodeType *parent = static_cast<BSTNodeType *>(node->parent_);
+    BSTNodeType *grandParent = static_cast<BSTNodeType *>(parent->parent_);
+
+    this->getHierarchy()->changeLeftSon(*parent, nullptr);
+    this->getHierarchy()->changeRightSon(*node, nullptr);
+
+    if (grandParent != nullptr) {
+        if (grandParent->left_ == parent) {
+            this->getHierarchy()->changeLeftSon(*grandParent, node);
+        } else {
+            this->getHierarchy()->changeRightSon(*grandParent, node);
+        }
+    } else {
+        this->getHierarchy()->changeRoot(node);
+    }
+
+    this->getHierarchy()->changeLeftSon(*parent, rightSon);
+    this->getHierarchy()->changeRightSon(*node, parent);
 }
 
 //----------
 
 template <typename K, typename T> bool BinarySearchTree<K, T>::equals(const ADT &other) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    const auto *otherBST = dynamic_cast<const BinarySearchTree<K, T> *>(&other);
+
+    if (otherBST == nullptr) {
+        return false;
+    }
+
+    return this->areEqual(*this, *otherBST);
 }
 
 //----------
@@ -781,20 +911,42 @@ template <typename K, typename T> bool BinarySearchTree<K, T>::equals(const ADT 
 template <typename K, typename T> Treap<K, T>::Treap() : rng_(std::random_device()()) {}
 
 template <typename K, typename T> void Treap<K, T>::removeNode(BSTNodeType *node) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    node->data_.priority_ = rng_.min();
+
+    while (this->getHierarchy()->degree(*node) == 2) {
+        BSTNodeType *leftSon = node->left_;
+        BSTNodeType *rightSon = node->right_;
+
+        if (leftSon->data_.priority_ < rightSon->data_.priority_) {
+            this->rotateRight(leftSon);
+        } else {
+            this->rotateLeft(rightSon);
+        }
+    }
+
+    GeneralBinarySearchTree<K, T, TreapItem<K, T>>::removeNode(node);
 }
 
 template <typename K, typename T> void Treap<K, T>::balanceTree(BSTNodeType *node) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    node->data_.priority_ = rng_();
+    BSTNodeType *parent = static_cast<BSTNodeType *>(node->parent_);
+
+    while (parent != nullptr && parent->data_.priority_ > node->data_.priority_) {
+        if (parent->left_ == node) {
+            this->rotateRight(node);
+        } else {
+            this->rotateLeft(node);
+        }
+        parent = static_cast<BSTNodeType *>(node->parent_);
+    }
 }
 
 template <typename K, typename T> bool Treap<K, T>::equals(const ADT &other) {
-    // TODO 11
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    auto *otherTreap = dynamic_cast<const Treap<K, T> *>(&other);
+    if (otherTreap == nullptr) {
+        return false;
+    }
+
+    return this->areEqual(*this, *otherTreap);
 }
 } // namespace ds::adt
