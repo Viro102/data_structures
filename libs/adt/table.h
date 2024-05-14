@@ -596,18 +596,45 @@ template <typename K, typename T> bool HashTable<K, T>::isEmpty() const {
 }
 
 template <typename K, typename T> void HashTable<K, T>::insert(const K &key, T data) {
-    // TODO: Implement
-    throw std::runtime_error("Not implemented");
+    size_t index = hashFunction_(key) % primaryRegion_->size();
+    SynonymTable *&synonymTable = primaryRegion_->access(index)->data_;
+
+    if (synonymTable == nullptr) {
+        synonymTable = new SynonymTable();
+    }
+
+    synonymTable->insert(key, data);
+    ++size_;
 }
 
 template <typename K, typename T> bool HashTable<K, T>::tryFind(const K &key, T *&data) const {
-    // TODO: Implement
-    throw std::runtime_error("Not implemented");
+    size_t hashValue = hashFunction_(key) % primaryRegion_->size();
+    SynonymTable *synonymTable = primaryRegion_->access(hashValue)->data_;
+
+    if (synonymTable == nullptr) {
+        return false;
+    }
+
+    return synonymTable->tryFind(key, data);
 }
 
 template <typename K, typename T> T HashTable<K, T>::remove(const K &key) {
-    // TODO: Implement
-    throw std::runtime_error("Not implemented");
+    size_t index = hashFunction_(key) % primaryRegion_->size();
+    SynonymTable *&synonymTable = primaryRegion_->access(index)->data_;
+
+    if (synonymTable == nullptr) {
+        throw std::out_of_range("No such key!");
+    }
+
+    T removedData = synonymTable->remove(key);
+    --size_;
+
+    if (synonymTable->isEmpty()) {
+        delete synonymTable;
+        synonymTable = nullptr;
+    }
+
+    return removedData;
 }
 
 template <typename K, typename T>
@@ -638,8 +665,19 @@ template <typename K, typename T> HashTable<K, T>::HashTableIterator::~HashTable
 
 template <typename K, typename T>
 typename HashTable<K, T>::HashTableIterator &HashTable<K, T>::HashTableIterator::operator++() {
-    // TODO: Implement
-    throw std::runtime_error("Not implemented");
+    ++(*synonymIterator_);
+    if (*synonymIterator_ == (**tablesCurrent_)->end()) {
+        ++(*tablesCurrent_);
+        delete synonymIterator_;
+        synonymIterator_ = nullptr;
+        while (*tablesCurrent_ != *tablesLast_ && **tablesCurrent_ == nullptr) {
+            ++(*tablesCurrent_);
+        }
+        if (*tablesCurrent_ != *tablesLast_) {
+            synonymIterator_ = new SynonymTableIterator((**tablesCurrent_)->begin());
+        }
+    }
+    return *this;
 }
 
 template <typename K, typename T>

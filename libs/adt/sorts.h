@@ -202,28 +202,7 @@ void QuickSort<T>::quick(amt::ImplicitSequence<T> &is,
 template <typename T>
 void HeapSort<T>::sort(amt::ImplicitSequence<T> &is,
                        std::function<bool(const T &, const T &)> compare) {
-    // FIXME
-    // 1. Get the size of the sequence
-    size_t n = is.size();
-
-    // 2. Create a temporary vector to hold the data from the sequence
-    std::vector<T> arr(n);
-    std::copy(is.begin(), is.end(), arr.begin());
-
-    // 3. Build the heap using std::make_heap
-    std::make_heap(arr.begin(), arr.end(), compare);
-
-    // 4. Extract elements one by one using std::heap_pop
-    for (int i = n - 1; i > 0; i--) {
-        // Move current root (largest element) to end
-        std::swap(arr[0], arr[i]);
-
-        // Reduce the heap size and maintain it with std::heap_pop
-        std::pop_heap(arr.begin(), arr.begin() + i, compare);
-    }
-
-    // 5. Copy the sorted data back to the implicit sequence
-    std::copy(arr.begin(), arr.end(), is.begin());
+    //  TODO: implement
 }
 
 template <typename T>
@@ -257,29 +236,38 @@ RadixSort<Key, T>::RadixSort(std::function<Key(const T &)> getKey) : getKey_(get
 template <typename Key, typename T>
 void RadixSort<Key, T>::sort(amt::ImplicitSequence<T> &is,
                              std::function<bool(const T &, const T &)> compare) {
-    // TODO 12
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    static_assert(std::is_integral_v<Key>, "Radix sort supports only integral types.");
+    const int maxDigits = std::numeric_limits<Key>::digits10 + 1; // Max decimal digits in Key
+    std::vector<std::vector<T>> buckets(10);                      // Buckets for digits 0-9
+
+    for (int exp = 1; exp <= std::pow(10, maxDigits - 1); exp *= 10) {
+        for (auto it = is.begin(); it != is.end(); ++it) {
+            int digit = (getKey_(*it) / exp) % 10;
+            buckets[digit].push_back(*it);
+        }
+
+        auto it = is.begin();
+        for (auto &bucket : buckets) {
+            for (auto &item : bucket) {
+                *it++ = item;
+            }
+            bucket.clear();
+        }
+    }
 }
 
 template <typename T>
 void MergeSort<T>::sort(amt::ImplicitSequence<T> &is,
                         std::function<bool(const T &, const T &)> compare) {
-    // TODO 12
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    //  TODO: implement
 }
 
 template <typename T> void MergeSort<T>::split(size_t n) {
-    // TODO 12
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    //  TODO: implement
 }
 
 template <typename T>
 void MergeSort<T>::merge(std::function<bool(const T &, const T &)> compare, size_t n) {
-    // TODO 12
-    // po implementacii vymazte vyhodenie vynimky!
-    throw std::runtime_error("Not implemented yet");
+    //  TODO: implement
 }
 } // namespace ds::adt
