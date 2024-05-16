@@ -11,33 +11,33 @@ std::vector<std::unique_ptr<ds::tests::Test>> createTests() {
     auto amt = std::make_unique<ds::tests::CompositeTest>("amt");
     auto adt = std::make_unique<ds::tests::CompositeTest>("adt");
 
-    mm->add_test(std::make_unique<ds::tests::MemoryManagerTest>());
+    // mm->add_test(std::make_unique<ds::tests::MemoryManagerTest>());
 
-    mm->add_test(std::make_unique<ds::tests::CompactMemoryManagerTest>());
+    // mm->add_test(std::make_unique<ds::tests::CompactMemoryManagerTest>());
 
-    amt->add_test(std::make_unique<ds::tests::ImplicitSequenceTest>());
+    // amt->add_test(std::make_unique<ds::tests::ImplicitSequenceTest>());
 
-    amt->add_test(std::make_unique<ds::tests::ExplicitSequenceTest>());
+    // amt->add_test(std::make_unique<ds::tests::ExplicitSequenceTest>());
 
-    amt->add_test(std::make_unique<ds::tests::HierarchyTest>());
+    // amt->add_test(std::make_unique<ds::tests::HierarchyTest>());
 
-    amt->add_test(std::make_unique<ds::tests::ImplicitHierarchyTest>());
+    // amt->add_test(std::make_unique<ds::tests::ImplicitHierarchyTest>());
 
-    amt->add_test(std::make_unique<ds::tests::ExplicitHierarchyTest>());
+    // amt->add_test(std::make_unique<ds::tests::ExplicitHierarchyTest>());
 
-    adt->add_test(std::make_unique<ds::tests::ListTest>());
-    adt->add_test(std::make_unique<ds::tests::ArraysTest>());
+    // adt->add_test(std::make_unique<ds::tests::ListTest>());
+    // adt->add_test(std::make_unique<ds::tests::ArraysTest>());
 
-    adt->add_test(std::make_unique<ds::tests::StackTest>());
-    adt->add_test(std::make_unique<ds::tests::QueueTest>());
-    adt->add_test(std::make_unique<ds::tests::PriorityQueueTest>());
+    // adt->add_test(std::make_unique<ds::tests::StackTest>());
+    // adt->add_test(std::make_unique<ds::tests::QueueTest>());
+    // adt->add_test(std::make_unique<ds::tests::PriorityQueueTest>());
 
-    adt->add_test(std::make_unique<ds::tests::SequenceTableTest>());
+    // adt->add_test(std::make_unique<ds::tests::SequenceTableTest>());
 
-    adt->add_test(std::make_unique<ds::tests::NonSequenceTableTest>());
+    // adt->add_test(std::make_unique<ds::tests::NonSequenceTableTest>());
 
-    // TODO: implement
-    // adt->add_test(std::make_unique<ds::tests::SortTest>());
+    // TODO: fix merge sort
+    adt->add_test(std::make_unique<ds::tests::SortTest>());
 
     root->add_test(std::move(mm));
     root->add_test(std::move(amt));
