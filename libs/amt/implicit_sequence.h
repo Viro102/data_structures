@@ -12,6 +12,7 @@ class ImplicitSequence : public Sequence<MemoryBlock<DataType>>, public Implicit
   public:
     using BlockType = MemoryBlock<DataType>;
     using MemoryManagerType = typename ImplicitAMS<DataType>::MemoryManagerType;
+    using value_type = DataType;
 
     ImplicitSequence() = default;
 
