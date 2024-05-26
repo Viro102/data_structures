@@ -1,3 +1,4 @@
+#include "complexities/queue_analyzer.h"
 #include "complexities/table_analyzer.h"
 #include <complexities/list_analyzer.h>
 #include <memory>
@@ -50,8 +51,9 @@ std::vector<std::unique_ptr<ds::tests::Test>> createTests() {
 
 std::vector<std::unique_ptr<ds::utils::Analyzer>> createAnalyzers() {
     std::vector<std::unique_ptr<ds::utils::Analyzer>> analyzers;
+    analyzers.emplace_back(std::make_unique<ds::utils::QueuesAnalyzer>());
     // analyzers.emplace_back(std::make_unique<ds::utils::ListsAnalyzer>());
-    analyzers.emplace_back(std::make_unique<ds::utils::TablesAnalyzer>());
+    // analyzers.emplace_back(std::make_unique<ds::utils::TablesAnalyzer>());
     return analyzers;
 }
 
