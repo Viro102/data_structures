@@ -3,10 +3,8 @@
 #include "../amt/explicit_hierarchy.h"
 #include "../amt/implicit_sequence.h"
 #include "abstract_data_type.h"
-#include "amt/abstract_memory_type.h"
 #include <cstddef>
 #include <functional>
-#include <limits>
 #include <numeric>
 #include <random>
 
