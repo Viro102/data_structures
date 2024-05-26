@@ -296,89 +296,85 @@ void RadixSort<Key, T>::sort(amt::ImplicitSequence<T> &is,
 template <typename T>
 void MergeSort<T>::sort(amt::ImplicitSequence<T> &is,
                         std::function<bool(const T &, const T &)> compare) {
-    // queue1_ = new ImplicitQueue<T>(is.size());
-    // queue2_ = new ImplicitQueue<T>(is.size());
-    // mergeQueue_ = new ImplicitQueue<T>(is.size());
+    queue1_ = new ImplicitQueue<T>(is.size());
+    queue2_ = new ImplicitQueue<T>(is.size());
+    mergeQueue_ = new ImplicitQueue<T>(is.size());
 
-    // // Initialize mergeQueue_ with elements from inputSequence
-    // for (const T &element : is) {
-    //     mergeQueue_->push(element);
-    // }
+    // Initialize mergeQueue_ with elements from inputSequence
+    for (size_t i = 0; i < is.size(); ++i) {
+        mergeQueue_->push(is.access(i)->data_);
+    }
 
-    // size_t i{1};
+    size_t i = 1;
+    while (i < is.size()) {
+        split(i);
+        merge(compare, i);
+        i = i * 2;
+    }
 
-    // for (; i < is.size() - 1;) {
-    //     split(i);
-    //     merge(compare, i);
-    //     i = i * 2;
-    // }
+    // Transfer sorted elements back to is
+    for (size_t i = 0; i < is.size(); ++i) {
+        is.access(i)->data_ = mergeQueue_->pop();
+    }
 
-    // split(i);
-    // merge(compare, i);
-
-    // // Transfer sorted elements back to is
-    // for (size_t i = 0; i < is.size() - 1; ++i) {
-    //     is.access(i)->data_ = mergeQueue_->pop();
-    // }
-
-    // delete queue1_;
-    // delete queue2_;
-    // delete mergeQueue_;
-    // queue1_ = nullptr;
-    // queue2_ = nullptr;
-    // mergeQueue_ = nullptr;
+    delete queue1_;
+    delete queue2_;
+    delete mergeQueue_;
+    queue1_ = nullptr;
+    queue2_ = nullptr;
+    mergeQueue_ = nullptr;
 }
 
 template <typename T> void MergeSort<T>::split(size_t n) {
-    // int count = 0;
-    // bool isFirst = true;
+    int count = 0;
+    bool isFirst = true;
 
-    // while (!mergeQueue_->isEmpty()) {
-    //     if (count % n == 0) {
-    //         count = 0;
-    //         isFirst = !isFirst;
-    //     }
+    while (!mergeQueue_->isEmpty()) {
+        if (count % n == 0) {
+            count = 0;
+            isFirst = !isFirst;
+        }
 
-    //     if (isFirst) {
-    //         queue1_->push(mergeQueue_->pop());
-    //     } else {
-    //         queue2_->push(mergeQueue_->pop());
-    //     }
-    //     ++count;
-    // }
+        if (isFirst) {
+            queue1_->push(mergeQueue_->pop());
+        } else {
+            queue2_->push(mergeQueue_->pop());
+        }
+        ++count;
+    }
 }
 
 template <typename T>
 void MergeSort<T>::merge(std::function<bool(const T &, const T &)> compare, size_t n) {
-    // int firstCount = 0;
-    // int secondCount = 0;
+    int firstCount = 0;
+    int secondCount = 0;
 
-    // do {
-    //     if (firstCount == 0 && secondCount == 0) {
-    //         firstCount = std::min(n, queue1_->size());
-    //         secondCount = std::min(n, queue2_->size());
-    //     }
+    while (!queue1_->isEmpty() || !queue2_->isEmpty()) {
+        if (firstCount == 0 && secondCount == 0) {
+            firstCount = std::min(n, queue1_->size());
+            secondCount = std::min(n, queue2_->size());
+        }
 
-    //     const T *key1 = (firstCount > 0) ? &queue1_->peek() : nullptr;
-    //     const T *key2 = (secondCount > 0) ? &queue2_->peek() : nullptr;
+        const T *key1 = (firstCount > 0) ? &queue1_->peek() : nullptr;
+        const T *key2 = (secondCount > 0) ? &queue2_->peek() : nullptr;
 
-    //     if (key1 != nullptr && key2 != nullptr) {
-    //         if (compare(*key1, *key2)) {
-    //             mergeQueue_->push(queue1_->pop());
-    //             --firstCount;
-    //         } else {
-    //             mergeQueue_->push(queue2_->pop());
-    //             --secondCount;
-    //         }
-    //     } else {
-    //         if (key1 != nullptr) {
-    //             mergeQueue_->push(queue1_->pop());
-    //             --firstCount;
-    //         } else if (key2 != nullptr) {
-    //             mergeQueue_->push(queue2_->pop());
-    //             --secondCount;
-    //         }
-    //     }
-    // } while (!queue1_->isEmpty() || !queue2_->isEmpty());
+        if (key1 != nullptr && key2 != nullptr) {
+            if (compare(*key1, *key2)) {
+                mergeQueue_->push(queue1_->pop());
+                --firstCount;
+            } else {
+                mergeQueue_->push(queue2_->pop());
+                --secondCount;
+            }
+        } else {
+            if (key1 != nullptr) {
+                mergeQueue_->push(queue1_->pop());
+                --firstCount;
+            } else if (key2 != nullptr) {
+                mergeQueue_->push(queue2_->pop());
+                --secondCount;
+            }
+        }
+    }
 }
 } // namespace ds::adt
