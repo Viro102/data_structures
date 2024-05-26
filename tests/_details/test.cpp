@@ -170,9 +170,7 @@ DummyData::DummyData(int number) : number_(new int(number)) {}
 
 DummyData::DummyData(const DummyData &other) : number_(new int(other.get_number())) {}
 
-// FIXME
-// DummyData::DummyData(DummyData &&other) noexcept : number_(std::exchange(other.number_, nullptr))
-// {}
+DummyData::DummyData(DummyData &&other) noexcept : number_(std::exchange(other.number_, nullptr)) {}
 
 DummyData::~DummyData() { delete number_; }
 
