@@ -167,8 +167,8 @@ class LeafTest : public Test {
      *  @param message message that describes the assertion.
      */
     template <class T>
-    auto assert_equals(T expected, T actual, std::string message)
-        -> std::enable_if_t<!std::is_floating_point_v<T>>;
+    auto assert_equals(T expected, T actual,
+                       std::string message) -> std::enable_if_t<!std::is_floating_point_v<T>>;
 
     /**
      *  @brief Asserts that @p expected and @p actual are equal
@@ -183,8 +183,8 @@ class LeafTest : public Test {
      *  @param epsilon precision used in the comparison.
      */
     template <class T>
-    auto assert_equals(T expected, T actual, T epsilon)
-        -> std::enable_if_t<std::is_floating_point_v<T>>;
+    auto assert_equals(T expected, T actual,
+                       T epsilon) -> std::enable_if_t<std::is_floating_point_v<T>>;
 
     /**
      *  @brief Asserts that @p expected and @p actual are equal
@@ -200,8 +200,8 @@ class LeafTest : public Test {
      *  @param message message that describes the assertion.
      */
     template <class T>
-    auto assert_equals(T expected, T actual, T epsilon, std::string message)
-        -> std::enable_if_t<std::is_floating_point_v<T>>;
+    auto assert_equals(T expected, T actual, T epsilon,
+                       std::string message) -> std::enable_if_t<std::is_floating_point_v<T>>;
 
     /**
      *  @brief Asserts that @p expected and @p actual are different.
@@ -228,8 +228,8 @@ class LeafTest : public Test {
      *  @param message message that describes the assertion.
      */
     template <class T>
-    auto assert_not_equals(T expected, T actual, std::string message)
-        -> std::enable_if_t<!std::is_floating_point_v<T>>;
+    auto assert_not_equals(T expected, T actual,
+                           std::string message) -> std::enable_if_t<!std::is_floating_point_v<T>>;
 
     /**
      *  @brief Asserts that @p expected and @p actual are different
@@ -244,8 +244,8 @@ class LeafTest : public Test {
      *  @param epsilon precision used in the comparison.
      */
     template <class T>
-    auto assert_not_equals(T expected, T actual, T epsilon)
-        -> std::enable_if_t<std::is_floating_point_v<T>>;
+    auto assert_not_equals(T expected, T actual,
+                           T epsilon) -> std::enable_if_t<std::is_floating_point_v<T>>;
 
     /**
      *  @brief Asserts that @p expected and @p actual are different
@@ -261,8 +261,8 @@ class LeafTest : public Test {
      *  @param message message that describes the assertion.
      */
     template <class T>
-    auto assert_not_equals(T expected, T actual, T epsilon, std::string message)
-        -> std::enable_if_t<std::is_floating_point_v<T>>;
+    auto assert_not_equals(T expected, T actual, T epsilon,
+                           std::string message) -> std::enable_if_t<std::is_floating_point_v<T>>;
 
     /**
      *  @brief Asserts that callable object @p f throws something.
@@ -468,7 +468,8 @@ class DummyData {
 
     DummyData(const DummyData &other);
 
-    DummyData(DummyData &&other) noexcept;
+    // FIXME
+    // DummyData(DummyData &&other) noexcept;
 
     ~DummyData();
 
@@ -483,8 +484,8 @@ class DummyData {
 // LeafTest:
 
 template <class T>
-auto LeafTest::assert_equals(T expected, T actual)
-    -> std::enable_if_t<!std::is_floating_point_v<T>> {
+auto LeafTest::assert_equals(T expected,
+                             T actual) -> std::enable_if_t<!std::is_floating_point_v<T>> {
     if constexpr (std::is_arithmetic_v<T>) {
         this->assert_equals(expected, actual,
                             "Expected " + std::to_string(expected) + " got " +
@@ -497,14 +498,14 @@ auto LeafTest::assert_equals(T expected, T actual)
 }
 
 template <class T>
-auto LeafTest::assert_equals(T expected, T actual, std::string m)
-    -> std::enable_if_t<!std::is_floating_point_v<T>> {
+auto LeafTest::assert_equals(T expected, T actual,
+                             std::string m) -> std::enable_if_t<!std::is_floating_point_v<T>> {
     this->assert_true(expected == actual, std::move(m));
 }
 
 template <class T>
-auto LeafTest::assert_equals(T expected, T actual, T epsilon)
-    -> std::enable_if_t<std::is_floating_point_v<T>> {
+auto LeafTest::assert_equals(T expected, T actual,
+                             T epsilon) -> std::enable_if_t<std::is_floating_point_v<T>> {
     auto ost = std::ostringstream();
 
     ost.precision(std::numeric_limits<double>::max_digits10);
@@ -514,14 +515,14 @@ auto LeafTest::assert_equals(T expected, T actual, T epsilon)
 }
 
 template <class T>
-auto LeafTest::assert_equals(T expected, T actual, T epsilon, std::string m)
-    -> std::enable_if_t<std::is_floating_point_v<T>> {
+auto LeafTest::assert_equals(T expected, T actual, T epsilon,
+                             std::string m) -> std::enable_if_t<std::is_floating_point_v<T>> {
     this->assert_true(std::abs(expected - actual) < epsilon, std::move(m));
 }
 
 template <class T>
-auto LeafTest::assert_not_equals(T expected, T actual)
-    -> std::enable_if_t<!std::is_floating_point_v<T>> {
+auto LeafTest::assert_not_equals(T expected,
+                                 T actual) -> std::enable_if_t<!std::is_floating_point_v<T>> {
     if constexpr (std::is_arithmetic_v<T>) {
         this->assert_not_equals(expected, actual,
                                 "Expected " + std::to_string(expected) + " got " +
@@ -534,14 +535,14 @@ auto LeafTest::assert_not_equals(T expected, T actual)
 }
 
 template <class T>
-auto LeafTest::assert_not_equals(T expected, T actual, std::string m)
-    -> std::enable_if_t<!std::is_floating_point_v<T>> {
+auto LeafTest::assert_not_equals(T expected, T actual,
+                                 std::string m) -> std::enable_if_t<!std::is_floating_point_v<T>> {
     this->assert_true(expected != actual, std::move(m));
 }
 
 template <class T>
-auto LeafTest::assert_not_equals(T expected, T actual, T epsilon)
-    -> std::enable_if_t<std::is_floating_point_v<T>> {
+auto LeafTest::assert_not_equals(T expected, T actual,
+                                 T epsilon) -> std::enable_if_t<std::is_floating_point_v<T>> {
     auto ost = std::ostringstream();
 
     ost.precision(std::numeric_limits<double>::max_digits10);
@@ -552,8 +553,8 @@ auto LeafTest::assert_not_equals(T expected, T actual, T epsilon)
 }
 
 template <class T>
-auto LeafTest::assert_not_equals(T expected, T actual, T epsilon, std::string m)
-    -> std::enable_if_t<std::is_floating_point_v<T>> {
+auto LeafTest::assert_not_equals(T expected, T actual, T epsilon,
+                                 std::string m) -> std::enable_if_t<std::is_floating_point_v<T>> {
     this->assert_true(std::abs(expected - actual) >= epsilon, std::move(m));
 }
 

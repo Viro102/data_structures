@@ -101,7 +101,9 @@ BlockType *CompactMemoryManager<BlockType>::allocateMemoryAt(size_t index) {
     }
 
     if (end_ - base_ > static_cast<std::ptrdiff_t>(index)) {
-        std::memmove(base_ + index + 1, base_ + index, (end_ - base_ - index) * sizeof(BlockType));
+        for (size_t i = end_ - base_; i > index; --i) {
+            base_[i] = std::move(base_[i - 1]);
+        }
     }
 
     this->allocatedBlockCount_++;
@@ -124,7 +126,9 @@ void CompactMemoryManager<BlockType>::releaseMemory(BlockType *pointer) {
 
 template <typename BlockType> void CompactMemoryManager<BlockType>::releaseMemoryAt(size_t index) {
     destroy(&getBlockAt(index));
-    std::memmove(base_ + index, base_ + index + 1, (end_ - base_ - index - 1) * sizeof(BlockType));
+    for (size_t i = index; i < end_ - base_ - 1; ++i) {
+        base_[i] = std::move(base_[i + 1]);
+    }
     end_--;
     this->allocatedBlockCount_--;
 }
@@ -198,8 +202,21 @@ template <typename BlockType> void CompactMemoryManager<BlockType>::clear() {
 
 template <typename BlockType>
 bool CompactMemoryManager<BlockType>::equals(const CompactMemoryManager<BlockType> &other) const {
-    return this == &other || (this->getAllocatedBlockCount() == other.allocatedBlockCount_ &&
-                              std::memcmp(base_, other.base_, getAllocatedBlocksSize()) == 0);
+    if (this == &other) {
+        return true;
+    }
+
+    if (this->getAllocatedBlockCount() != other.allocatedBlockCount_) {
+        return false;
+    }
+
+    for (size_t i = 0; i < this->getAllocatedBlockCount(); ++i) {
+        if (std::memcmp(base_ + i, other.base_ + i, sizeof(BlockType)) != 0) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 template <typename BlockType>
