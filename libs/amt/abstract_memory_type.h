@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../constants.h"
 #include "../mm/compact_memory_manager.h"
 #include <functional>
 
@@ -10,7 +9,7 @@ class unavailable_function_call : public std::bad_function_call {
     unavailable_function_call(std::string what) : what_(std::move(what)) {}
 
     unavailable_function_call(const unavailable_function_call &other) noexcept
-        : what_(other.what_){};
+        : what_(other.what_) {};
 
     unavailable_function_call &operator=(const unavailable_function_call &other) noexcept {
         what_ = other.what_;

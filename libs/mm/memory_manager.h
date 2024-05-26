@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../constants.h"
-#include "../heap_monitor.h"
+#include <cstddef>
 
 namespace ds::mm {
 template <typename BlockType> class MemoryManager {

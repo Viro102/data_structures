@@ -5,7 +5,6 @@
 #include "../amt/implicit_sequence.h"
 #include "abstract_data_type.h"
 #include <cmath>
-#include <functional>
 #include <stdexcept>
 
 namespace ds::adt {

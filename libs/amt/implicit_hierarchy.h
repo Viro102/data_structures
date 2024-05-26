@@ -1,9 +1,9 @@
 #pragma once
 
 #include "abstract_memory_type.h"
-#include "constants.h"
 #include "hierarchy.h"
 #include <cmath>
+#include <libs/constants.h>
 
 namespace ds::amt {
 template <typename DataType, size_t K>
