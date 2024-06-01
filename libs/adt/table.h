@@ -3,7 +3,6 @@
 #include "../amt/explicit_hierarchy.h"
 #include "../amt/implicit_sequence.h"
 #include "abstract_data_type.h"
-#include "adt/list.h"
 #include <cstddef>
 #include <functional>
 #include <numeric>
@@ -164,12 +163,12 @@ class HashTable : public Table<K, T>, public AUMS<TableItem<K, T>> {
 
     bool tryFind(const K &key, T *&data) const override;
 
-    ds::adt::ImplicitList<T> findRegex(const std::string pattern) {
-        ds::adt::ImplicitList<T> matched;
+    ds::amt::ImplicitSequence<T> findRegex(const std::string pattern) {
+        ds::amt::ImplicitSequence<T> matched;
         std::regex regex_pattern(pattern);
         std::vector<T> matchedKeys;
 
-        for (const auto &pair : this) {
+        for (const auto &pair : *this) {
             if (std::regex_match(pair.key_, regex_pattern)) {
                 matched.insertLast(pair.data_);
             }
