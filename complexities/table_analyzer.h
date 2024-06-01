@@ -1,7 +1,7 @@
 #pragma once
 
-#include <complexities/complexity_analyzer.h>
-#include <libs/adt/table.h>
+#include "complexities/complexity_analyzer.h"
+#include "libs/adt/table.h"
 #include <memory>
 #include <random>
 

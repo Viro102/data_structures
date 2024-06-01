@@ -1,8 +1,8 @@
+#include "complexities/list_analyzer.h"
 #include "complexities/queue_analyzer.h"
 #include "complexities/table_analyzer.h"
-#include <complexities/list_analyzer.h>
+#include "tests/root.h"
 #include <memory>
-#include <tests/root.h>
 
 #ifndef ANALYZER_OUTPUT
 #define ANALYZER_OUTPUT "."

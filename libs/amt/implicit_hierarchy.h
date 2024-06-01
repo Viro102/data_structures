@@ -2,8 +2,8 @@
 
 #include "abstract_memory_type.h"
 #include "hierarchy.h"
+#include "libs/constants.h"
 #include <cmath>
-#include <libs/constants.h>
 
 namespace ds::amt {
 template <typename DataType, size_t K>

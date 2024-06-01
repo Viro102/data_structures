@@ -1,7 +1,7 @@
 #pragma once
 
-#include <complexities/complexity_analyzer.h>
-#include <libs/adt/priority_queue.h>
+#include "complexities/complexity_analyzer.h"
+#include "libs/adt/priority_queue.h"
 #include <random>
 
 namespace ds::utils {
