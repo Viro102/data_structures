@@ -74,6 +74,10 @@ class ImplicitSequence : public Sequence<MemoryBlock<DataType>>, public Implicit
 
         DataType &operator*();
 
+        using value_type = DataType;
+        using pointer = DataType *;
+        using reference = DataType &;
+
       private:
         ImplicitSequence<DataType> *sequence_;
         size_t position_;
