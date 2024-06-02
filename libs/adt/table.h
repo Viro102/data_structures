@@ -10,6 +10,7 @@
 #include <regex>
 
 namespace ds::adt {
+
 template <typename K, typename T> struct TableItem {
     K key_;
     T data_;
@@ -26,13 +27,9 @@ template <typename K, typename T> struct TableItem {
 template <typename K, typename T> class Table : virtual public ADT {
   public:
     virtual void insert(const K &key, T data) = 0;
-
     virtual T &find(const K &key);
-
     virtual bool tryFind(const K &key, T *&data) const = 0;
-
     virtual bool contains(const K &key) const;
-
     virtual T remove(const K &key) = 0;
 
   protected:
@@ -45,7 +42,6 @@ template <typename K, typename T, typename SequenceType>
 class SequenceTable : public Table<K, T>, public ADS<TableItem<K, T>> {
   public:
     SequenceTable();
-
     SequenceTable(const SequenceTable &other);
 
     bool tryFind(const K &key, T *&data) const override;
@@ -56,7 +52,6 @@ class SequenceTable : public Table<K, T>, public ADS<TableItem<K, T>> {
     virtual BlockType *findBlockWithKey(const K &key) const = 0;
 
     IteratorType begin();
-
     IteratorType end();
 
   protected:
@@ -82,7 +77,6 @@ template <typename K, typename T>
 class UnsortedImplicitSequenceTable : public UnsortedSequenceTable<K, T, amt::IS<TableItem<K, T>>> {
   public:
     void insert(const K &key, T data) override;
-
     T remove(const K &key) override;
 
     bool equals(const ADT &other) override;
@@ -100,7 +94,6 @@ class UnsortedExplicitSequenceTable
     : public UnsortedSequenceTable<K, T, amt::SinglyLS<TableItem<K, T>>> {
   public:
     void insert(const K &key, T data) override;
-
     T remove(const K &key) override;
 
     bool equals(const ADT &other) override;
@@ -117,9 +110,7 @@ template <typename K, typename T>
 class SortedSequenceTable : public SequenceTable<K, T, amt::IS<TableItem<K, T>>> {
   public:
     void insert(const K &key, T data) override;
-
     T remove(const K &key) override;
-
     bool equals(const ADT &other) override;
 
   protected:
@@ -142,28 +133,19 @@ class HashTable : public Table<K, T>, public AUMS<TableItem<K, T>> {
     using HashFunctionType = std::function<size_t(const K &)>;
 
     HashTable();
-
     HashTable(const HashTable &other);
-
     HashTable(HashFunctionType hashFunction, size_t capacity);
-
     ~HashTable() override;
 
     ADT &assign(const ADT &other) override;
-
     bool equals(const ADT &other) override;
-
     void clear() override;
-
     size_t size() const override;
-
     bool isEmpty() const override;
 
     void insert(const K &key, T data) override;
-
     bool tryFind(const K &key, T *&data) const override;
-
-    ds::amt::ImplicitSequence<T> findRegex(const std::string pattern) {
+    ds::amt::ImplicitSequence<T> findRegex(const std::string &pattern) {
         ds::amt::ImplicitSequence<T> matched;
         std::regex regex_pattern(pattern);
         std::vector<T> matchedKeys;
@@ -176,7 +158,6 @@ class HashTable : public Table<K, T>, public AUMS<TableItem<K, T>> {
 
         return matched;
     }
-
     T remove(const K &key) override;
 
   private:
@@ -194,19 +175,12 @@ class HashTable : public Table<K, T>, public AUMS<TableItem<K, T>> {
     class HashTableIterator {
       public:
         HashTableIterator(PrimaryRegionIterator *tablesFirst, PrimaryRegionIterator *tablesLast);
-
         HashTableIterator(const HashTableIterator &other);
-
         ~HashTableIterator();
-
         HashTableIterator &operator++();
-
         HashTableIterator operator++(int);
-
         bool operator==(const HashTableIterator &other) const;
-
         bool operator!=(const HashTableIterator &other) const;
-
         TableItem<K, T> &operator*();
 
       private:
@@ -216,7 +190,6 @@ class HashTable : public Table<K, T>, public AUMS<TableItem<K, T>> {
     };
 
     HashTableIterator begin() const;
-
     HashTableIterator end() const;
 };
 
@@ -228,23 +201,17 @@ class GeneralBinarySearchTree : public Table<K, T>, public ADS<ItemType> {
     using IteratorType = typename amt::BinaryEH<ItemType>::IteratorType;
 
     GeneralBinarySearchTree();
-
     GeneralBinarySearchTree(const GeneralBinarySearchTree &other);
-
     ~GeneralBinarySearchTree() override;
 
     size_t size() const override;
-
     void clear() override;
 
     void insert(const K &key, T data) override;
-
     bool tryFind(const K &key, T *&data) const override;
-
     T remove(const K &key) override;
 
     IteratorType begin() const;
-
     IteratorType end() const;
 
   protected:
@@ -253,13 +220,11 @@ class GeneralBinarySearchTree : public Table<K, T>, public ADS<ItemType> {
     amt::BinaryEH<ItemType> *getHierarchy() const;
 
     virtual void removeNode(BSTNodeType *node);
-
     virtual void balanceTree(BSTNodeType *node) {}
 
     bool tryFindNodeWithKey(const K &key, BSTNodeType *&node) const;
 
     void rotateLeft(BSTNodeType *node);
-
     void rotateRight(BSTNodeType *node);
 
   private:
@@ -284,14 +249,12 @@ template <typename K, typename T>
 class Treap : public GeneralBinarySearchTree<K, T, TreapItem<K, T>> {
   public:
     Treap();
-
     bool equals(const ADT &other) override;
 
   protected:
     using BSTNodeType = typename GeneralBinarySearchTree<K, T, TreapItem<K, T>>::BSTNodeType;
 
     void removeNode(BSTNodeType *node) override;
-
     void balanceTree(BSTNodeType *node) override;
 
   private:
@@ -307,7 +270,7 @@ bool Table<K, T>::areEqual(TableT &table1, const ADT &table2) {
         return true;
     }
 
-    const auto *tab2 = dynamic_cast<const Table<K, T> *>(&table2);
+    const Table<K, T> *tab2 = dynamic_cast<const TableT *>(&table2);
     if (tab2 == nullptr) {
         return false;
     }
@@ -351,12 +314,11 @@ SequenceTable<K, T, SequenceType>::SequenceTable(const SequenceTable &other)
 
 template <typename K, typename T, typename SequenceType>
 bool SequenceTable<K, T, SequenceType>::tryFind(const K &key, T *&data) const {
-    BlockType *block = this->findBlockWithKey(key);
-    if (block == nullptr) {
+    BlockType *blockWithKey = this->findBlockWithKey(key);
+    if (blockWithKey == nullptr) {
         return false;
     }
-
-    data = &block->data_.data_;
+    data = &blockWithKey->data_.data_;
     return true;
 }
 
@@ -382,33 +344,33 @@ template <typename K, typename T, typename SequenceType>
 typename UnsortedSequenceTable<K, T, SequenceType>::BlockType *
 UnsortedSequenceTable<K, T, SequenceType>::findBlockWithKey(const K &key) const {
     return this->getSequence()->findBlockWithProperty(
-        [&key](const SequenceType::BlockType *item) { return item->data_.key_ == key; });
+        [&key](BlockType *b) -> bool { return b->data_.key_ == key; });
 }
 
 //----------
 
 template <typename K, typename T>
 void UnsortedImplicitSequenceTable<K, T>::insert(const K &key, T data) {
-    if (this->findBlockWithKey(key) != nullptr) {
-        throw std::invalid_argument("Key already exists!");
+    if (this->contains(key)) {
+        throw std::logic_error("Table already contains element associated with given key!");
     }
 
-    TableItem<K, T> *newItem = &this->getSequence()->insertLast().data_;
-
-    newItem->key_ = key;
-    newItem->data_ = data;
+    TableItem<K, T> &tableItem = this->getSequence()->insertLast().data_;
+    tableItem.key_ = key;
+    tableItem.data_ = data;
 }
 
 template <typename K, typename T> T UnsortedImplicitSequenceTable<K, T>::remove(const K &key) {
-    BlockType *block = this->findBlockWithKey(key);
-    if (block == nullptr) {
+    BlockType *blockWithKey = this->findBlockWithKey(key);
+
+    if (blockWithKey == nullptr) {
         throw std::out_of_range("No such key!");
     }
 
-    T result = block->data_.data_;
-
-    if (BlockType *lastBlock = this->getSequence()->accessLast(); block != lastBlock) {
-        std::swap(block->data_, lastBlock->data_);
+    T result = blockWithKey->data_.data_;
+    BlockType *lastBlock = this->getSequence()->accessLast();
+    if (blockWithKey != lastBlock) {
+        std::swap(blockWithKey->data_, lastBlock->data_);
     }
     this->getSequence()->removeLast();
     return result;
@@ -416,78 +378,75 @@ template <typename K, typename T> T UnsortedImplicitSequenceTable<K, T>::remove(
 
 template <typename K, typename T>
 bool UnsortedImplicitSequenceTable<K, T>::equals(const ADT &other) {
-    return this->areEqual(*this, other);
+    return Table<K, T>::areEqual(*this, other);
 }
 
 //----------
 
 template <typename K, typename T>
 void UnsortedExplicitSequenceTable<K, T>::insert(const K &key, T data) {
-    if (this->findBlockWithKey(key) != nullptr) {
-        throw std::invalid_argument("Key already exists!");
+    if (this->contains(key)) {
+        throw std::logic_error("Table already contains element associated with given key!");
     }
 
-    TableItem<K, T> *newBlock = &this->getSequence()->insertFirst().data_;
-    newBlock->key_ = key;
-    newBlock->data_ = data;
+    TableItem<K, T> &tableItem = this->getSequence()->insertFirst().data_;
+    tableItem.key_ = key;
+    tableItem.data_ = data;
 }
 
 template <typename K, typename T> T UnsortedExplicitSequenceTable<K, T>::remove(const K &key) {
-    BlockType *block = this->findBlockWithKey(key);
-    if (block == nullptr) {
+    BlockType *blockWithKey = this->findBlockWithKey(key);
+
+    if (blockWithKey == nullptr) {
         throw std::out_of_range("No such key!");
     }
 
-    T result = block->data_.data_;
-
-    if (BlockType *firstBlock = this->getSequence()->accessFirst(); block != firstBlock) {
-        std::swap(block->data_, firstBlock->data_);
+    T result = blockWithKey->data_.data_;
+    BlockType *firstBlock = this->getSequence()->accessFirst();
+    if (blockWithKey != firstBlock) {
+        std::swap(blockWithKey->data_, firstBlock->data_);
     }
-
     this->getSequence()->removeFirst();
     return result;
 }
 
 template <typename K, typename T>
 bool UnsortedExplicitSequenceTable<K, T>::equals(const ADT &other) {
-    return this->areEqual(*this, other);
+    return Table<K, T>::areEqual(*this, other);
 }
 
 //----------
 
 template <typename K, typename T> void SortedSequenceTable<K, T>::insert(const K &key, T data) {
-    TableItem<K, T> *item;
+    TableItem<K, T> *tableItem;
 
     if (this->isEmpty()) {
-        item = &this->getSequence()->insertFirst().data_;
+        tableItem = &this->getSequence()->insertFirst().data_;
     } else {
-        BlockType *block = nullptr;
-        if (this->tryFindBlockWithKey(key, 0, this->size(), block)) {
-            throw std::invalid_argument("Key already exists!");
+        BlockType *blok = nullptr;
+        if (this->tryFindBlockWithKey(key, 0, this->size(), blok)) {
+            throw std::logic_error("Duplicate key!");
         }
-
-        item = key > block->data_.key_ ? &this->getSequence()->insertAfter(*block).data_
-                                       : &this->getSequence()->insertBefore(*block).data_;
+        tableItem = key > blok->data_.key_ ? &this->getSequence()->insertAfter(*blok).data_
+                                           : &this->getSequence()->insertBefore(*blok).data_;
     }
 
-    item->key_ = key;
-    item->data_ = data;
+    tableItem->key_ = key;
+    tableItem->data_ = data;
 }
 
 template <typename K, typename T> T SortedSequenceTable<K, T>::remove(const K &key) {
-    BlockType *block = nullptr;
-    if (!this->tryFindBlockWithKey(key, 0, this->size(), block)) {
+    BlockType *blockWithKey = nullptr;
+    if (!this->tryFindBlockWithKey(key, 0, this->size(), blockWithKey)) {
         throw std::out_of_range("No such key!");
     }
 
-    T result = block->data_.data_;
-
-    if (this->getSequence()->accessFirst() == block) {
+    T result = blockWithKey->data_.data_;
+    if (this->getSequence()->accessFirst() == blockWithKey) {
         this->getSequence()->removeFirst();
     } else {
-        this->getSequence()->removeNext(*this->getSequence()->accessPrevious(*block));
+        this->getSequence()->removeNext(*this->getSequence()->accessPrevious(*blockWithKey));
     }
-
     return result;
 }
 
@@ -499,22 +458,7 @@ SortedSequenceTable<K, T>::findBlockWithKey(const K &key) const {
 }
 
 template <typename K, typename T> bool SortedSequenceTable<K, T>::equals(const ADT &other) {
-    const auto *otherTable = dynamic_cast<const SortedSequenceTable<K, T> *>(&other);
-    if (otherTable == nullptr) {
-        return false;
-    }
-
-    if (this->size() != otherTable->size()) {
-        return false;
-    }
-
-    for (size_t i = 0; i < this->size(); ++i) {
-        if (this->getSequence()->access(i)->data_ != otherTable->getSequence()->access(i)->data_) {
-            return false;
-        }
-    }
-
-    return true;
+    return Table<K, T>::areEqual(*this, other);
 }
 
 template <typename K, typename T>
@@ -525,23 +469,21 @@ bool SortedSequenceTable<K, T>::tryFindBlockWithKey(const K &key, size_t firstIn
         return false;
     }
 
-    size_t middleIndex = firstIndex;
-
+    size_t midIndex = firstIndex;
     while (firstIndex < lastIndex) {
-        middleIndex = std::midpoint(firstIndex, lastIndex);
-        // middleIndex = firstIndex + (lastIndex - firstIndex) / 2;
-        lastBlock = this->getSequence()->access(middleIndex);
+        midIndex = std::midpoint(firstIndex, lastIndex);
+        lastBlock = this->getSequence()->access(midIndex);
 
         if (lastBlock->data_.key_ < key) {
-            firstIndex = middleIndex + 1;
+            firstIndex = midIndex + 1;
         } else if (lastBlock->data_.key_ > key) {
-            lastIndex = middleIndex;
+            lastIndex = midIndex;
         } else {
             break;
         }
     }
 
-    lastBlock = this->getSequence()->access(middleIndex);
+    lastBlock = this->getSequence()->access(midIndex);
     return lastBlock->data_.key_ == key;
 }
 
@@ -570,7 +512,7 @@ template <typename K, typename T> HashTable<K, T>::~HashTable() {
 
 template <typename K, typename T> ADT &HashTable<K, T>::assign(const ADT &other) {
     if (this != &other) {
-        const auto &otherTable = dynamic_cast<const HashTable &>(other);
+        const HashTable &otherTable = dynamic_cast<const HashTable &>(other);
         this->clear();
         for (TableItem<K, T> &otherItem : otherTable) {
             this->insert(otherItem.key_, otherItem.data_);
@@ -581,16 +523,7 @@ template <typename K, typename T> ADT &HashTable<K, T>::assign(const ADT &other)
 }
 
 template <typename K, typename T> bool HashTable<K, T>::equals(const ADT &other) {
-    auto *otherHashTable = dynamic_cast<const HashTable<K, T> *>(&other);
-    if (otherHashTable == nullptr) {
-        return false;
-    }
-
-    if (this->size() != otherHashTable->size()) {
-        return false;
-    }
-
-    return this->areEqual(*this, *otherHashTable);
+    return Table<K, T>::areEqual(*this, other);
 }
 
 template <typename K, typename T> void HashTable<K, T>::clear() {
@@ -614,6 +547,7 @@ template <typename K, typename T> void HashTable<K, T>::insert(const K &key, T d
 
     if (synonymTable == nullptr) {
         synonymTable = new SynonymTable();
+        primaryRegion_->access(index)->data_ = synonymTable;
     }
 
     synonymTable->insert(key, data);
@@ -621,8 +555,8 @@ template <typename K, typename T> void HashTable<K, T>::insert(const K &key, T d
 }
 
 template <typename K, typename T> bool HashTable<K, T>::tryFind(const K &key, T *&data) const {
-    size_t hashValue = hashFunction_(key) % primaryRegion_->size();
-    SynonymTable *synonymTable = primaryRegion_->access(hashValue)->data_;
+    size_t index = hashFunction_(key) % primaryRegion_->size();
+    SynonymTable *synonymTable = primaryRegion_->access(index)->data_;
 
     if (synonymTable == nullptr) {
         return false;
@@ -640,13 +574,13 @@ template <typename K, typename T> T HashTable<K, T>::remove(const K &key) {
     }
 
     T removedData = synonymTable->remove(key);
-    --size_;
 
     if (synonymTable->isEmpty()) {
         delete synonymTable;
-        synonymTable = nullptr;
+        primaryRegion_->access(index)->data_ = nullptr;
     }
 
+    --size_;
     return removedData;
 }
 
@@ -758,34 +692,30 @@ void GeneralBinarySearchTree<K, T, ItemType>::clear() {
 template <typename K, typename T, typename ItemType>
 void GeneralBinarySearchTree<K, T, ItemType>::insert(const K &key, T data) {
     BSTNodeType *newNode = nullptr;
-
     if (this->isEmpty()) {
         newNode = &this->getHierarchy()->emplaceRoot();
     } else {
         BSTNodeType *parent = nullptr;
-        if (tryFindNodeWithKey(key, parent)) {
-            throw std::runtime_error("Table already contains an item with the given key!");
+        if (this->tryFindNodeWithKey(key, parent)) {
+            throw std::logic_error("Table already contains an element associated with given key!");
         }
-        if (key > parent->data_.key_) {
-            newNode = &this->getHierarchy()->insertRightSon(*parent);
-        } else {
-            newNode = &this->getHierarchy()->insertLeftSon(*parent);
-        }
+        newNode = key > parent->data_.key_ ? &this->getHierarchy()->insertRightSon(*parent)
+                                           : &this->getHierarchy()->insertLeftSon(*parent);
     }
 
     newNode->data_.key_ = key;
     newNode->data_.data_ = data;
+
     ++size_;
-    balanceTree(newNode);
+    this->balanceTree(newNode);
 }
 
 template <typename K, typename T, typename ItemType>
 bool GeneralBinarySearchTree<K, T, ItemType>::tryFind(const K &key, T *&data) const {
     BSTNodeType *nodeWithKey = nullptr;
-    if (!tryFindNodeWithKey(key, nodeWithKey)) {
+    if (!this->tryFindNodeWithKey(key, nodeWithKey)) {
         return false;
     }
-
     data = &nodeWithKey->data_.data_;
     return true;
 }
@@ -793,14 +723,13 @@ bool GeneralBinarySearchTree<K, T, ItemType>::tryFind(const K &key, T *&data) co
 template <typename K, typename T, typename ItemType>
 T GeneralBinarySearchTree<K, T, ItemType>::remove(const K &key) {
     BSTNodeType *nodeWithKey = nullptr;
-
-    if (!tryFindNodeWithKey(key, nodeWithKey)) {
+    if (!this->tryFindNodeWithKey(key, nodeWithKey)) {
         throw std::out_of_range("No such key!");
     }
 
     T result = nodeWithKey->data_.data_;
-    removeNode(nodeWithKey);
-    --size_;
+    this->removeNode(nodeWithKey);
+    size_--;
     return result;
 }
 
@@ -879,17 +808,16 @@ bool GeneralBinarySearchTree<K, T, ItemType>::tryFindNodeWithKey(const K &key,
     }
 
     node = this->getHierarchy()->accessRoot();
-
     while (node->data_.key_ != key && !this->getHierarchy()->isLeaf(*node)) {
         if (key < node->data_.key_) {
-            if (node->left_ != nullptr) {
-                node = node->left_;
+            if (this->getHierarchy()->hasLeftSon(*node)) {
+                node = this->getHierarchy()->accessLeftSon(*node);
             } else {
                 return false;
             }
         } else {
-            if (node->right_ != nullptr) {
-                node = node->right_;
+            if (this->getHierarchy()->hasRightSon(*node)) {
+                node = this->getHierarchy()->accessRightSon(*node);
             } else {
                 return false;
             }
@@ -948,13 +876,7 @@ void GeneralBinarySearchTree<K, T, ItemType>::rotateRight(BSTNodeType *node) {
 //----------
 
 template <typename K, typename T> bool BinarySearchTree<K, T>::equals(const ADT &other) {
-    const auto *otherBST = dynamic_cast<const BinarySearchTree<K, T> *>(&other);
-
-    if (otherBST == nullptr) {
-        return false;
-    }
-
-    return this->areEqual(*this, *otherBST);
+    return Table<K, T>::areEqual(*this, other);
 }
 
 //----------
@@ -993,11 +915,6 @@ template <typename K, typename T> void Treap<K, T>::balanceTree(BSTNodeType *nod
 }
 
 template <typename K, typename T> bool Treap<K, T>::equals(const ADT &other) {
-    auto *otherTreap = dynamic_cast<const Treap<K, T> *>(&other);
-    if (otherTreap == nullptr) {
-        return false;
-    }
-
-    return this->areEqual(*this, *otherTreap);
+    return Table<K, T>::areEqual(*this, other);
 }
 } // namespace ds::adt

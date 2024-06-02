@@ -5,9 +5,11 @@
 #include "../amt/implicit_sequence.h"
 #include "abstract_data_type.h"
 #include <cmath>
+#include <functional>
 #include <stdexcept>
 
 namespace ds::adt {
+
 template <typename P, typename T> struct PriorityQueueItem {
     P priority_;
     T data_;
@@ -26,9 +28,7 @@ template <typename P, typename T> using PQItem = PriorityQueueItem<P, T>;
 template <typename P, typename T> class PriorityQueue : virtual public ADT {
   public:
     virtual void push(P priority, T data) = 0;
-
     virtual T &peek() = 0;
-
     virtual T pop() = 0;
 };
 
@@ -40,7 +40,6 @@ template <typename P, typename T, typename SequenceType>
 class SequencePriorityQueue : public PriorityQueue<P, T>, public ADS<PQItem<P, T>> {
   public:
     SequencePriorityQueue();
-
     SequencePriorityQueue(const SequencePriorityQueue &other);
 
     bool equals(const ADT &other) override;
@@ -72,7 +71,6 @@ template <typename P, typename T, typename SequenceType>
 class SortedSequencePriorityQueue : public SequencePriorityQueue<P, T, SequenceType> {
   public:
     T &peek() override;
-
     T pop() override;
 
   protected:
@@ -89,7 +87,6 @@ class UnsortedImplicitSequencePriorityQueue
     : public UnsortedSequencePriorityQueue<P, T, amt::IS<PQItem<P, T>>> {
   public:
     void push(P priority, T data) override;
-
     T pop() override;
 
   private:
@@ -105,7 +102,6 @@ class UnsortedExplicitSequencePriorityQueue
     : public UnsortedSequencePriorityQueue<P, T, amt::SinglyLS<PQItem<P, T>>> {
   public:
     void push(P priority, T data) override;
-
     T pop() override;
 
   private:
@@ -154,25 +150,17 @@ template <typename P, typename T>
 class TwoLists : public AUMS<PQItem<P, T>>, public PriorityQueue<P, T> {
   public:
     TwoLists(size_t expectedSize);
-
     TwoLists(const TwoLists<P, T> &other);
-
     ~TwoLists();
 
     ADT &assign(const ADT &other) override;
-
     void clear() override;
-
     size_t size() const override;
-
     bool isEmpty() const override;
-
     bool equals(const ADT &other) override;
 
     void push(P priority, T data) override;
-
     T &peek() override;
-
     T pop() override;
 
   private:
@@ -191,20 +179,16 @@ template <typename P, typename T>
 class BinaryHeap : public PriorityQueue<P, T>, public ADS<PQItem<P, T>> {
   public:
     BinaryHeap();
-
     BinaryHeap(const BinaryHeap &other);
 
     bool equals(const ADT &other) override;
 
     void push(P priority, T data) override;
-
     T &peek() override;
-
     T pop() override;
 
   private:
     using HierarchyBlockType = typename amt::BinaryIH<PQItem<P, T>>::BlockType;
-
     amt::BinaryIH<PQItem<P, T>> *getHierarchy();
 };
 
@@ -242,13 +226,12 @@ typename SequenceType::BlockType *
 UnsortedSequencePriorityQueue<P, T, SequenceType>::findHighestPriorityBlock() {
     typename SequenceType::BlockType *bestBlock = this->getSequence()->accessFirst();
 
-    this->getSequence()->processBlocksForward(this->getSequence()->accessNext(*bestBlock),
-                                              [&bestBlock](typename SequenceType::BlockType *b) {
-                                                  if (bestBlock->data_.priority_ >
-                                                      b->data_.priority_) {
-                                                      bestBlock = b;
-                                                  }
-                                              });
+    this->getSequence()->processBlocksForward(
+        this->getSequence()->accessNext(*bestBlock), [&](typename SequenceType::BlockType *b) {
+            if (bestBlock->data_.priority_ > b->data_.priority_) {
+                bestBlock = b;
+            }
+        });
 
     return bestBlock;
 }
@@ -418,46 +401,41 @@ template <typename P, typename T> bool TwoLists<P, T>::equals(const ADT &other) 
 }
 
 template <typename P, typename T> void TwoLists<P, T>::push(P priority, T data) {
-    PQItem<P, T> *dataFront = nullptr;
+    PQItem<P, T> *frontData = nullptr;
 
     if (shortSequence_->isEmpty() || priority < shortSequence_->accessFirst()->data_.priority_ ||
         (longSequence_->isEmpty() && shortSequence_->size() < shortSequence_->getCapacity())) {
-
         if (shortSequence_->size() == shortSequence_->getCapacity()) {
             ShortSequenceBlockType *shortBlock = shortSequence_->accessFirst();
-            LongSequenceBlockType *longBlock = &longSequence_->insertLast();
-
-            longBlock->data_.priority_ = shortBlock->data_.priority_;
-            longBlock->data_.data_ = shortBlock->data_.data_;
-
+            LongSequenceBlockType longBlock = longSequence_->insertLast();
+            longBlock.data_.priority_ = shortBlock->data_.priority_;
+            longBlock.data_.data_ = shortBlock->data_.data_;
             shortSequence_->removeFirst();
         }
 
         if (shortSequence_->isEmpty() || priority < shortSequence_->accessLast()->data_.priority_) {
-            dataFront = &(shortSequence_->insertLast().data_);
+            frontData = &(shortSequence_->insertLast().data_);
+        } else if (priority > shortSequence_->accessFirst()->data_.priority_) {
+            frontData = &(shortSequence_->insertFirst().data_);
         } else {
-            if (priority > shortSequence_->accessFirst()->data_.priority_) {
-                dataFront = &(shortSequence_->insertFirst().data_);
-            } else {
-                dataFront = &(shortSequence_
-                                  ->insertBefore(*shortSequence_->findBlockWithProperty(
-                                      [priority](ShortSequenceBlockType *block) {
-                                          return block->data_.priority_ <= priority;
-                                      }))
-                                  .data_);
-            }
+            frontData = &(shortSequence_
+                              ->insertBefore(*shortSequence_->findBlockWithProperty(
+                                  [&priority](ShortSequenceBlockType *block) {
+                                      return block->data_.priority_ <= priority;
+                                  }))
+                              .data_);
         }
     } else {
-        dataFront = &(longSequence_->insertLast().data_);
+        frontData = &(longSequence_->insertLast().data_);
     }
 
-    dataFront->priority_ = priority;
-    dataFront->data_ = data;
+    frontData->priority_ = priority;
+    frontData->data_ = data;
 }
 
 template <typename P, typename T> T &TwoLists<P, T>::peek() {
     if (shortSequence_->isEmpty()) {
-        throw std::out_of_range("Queue is empty!");
+        throw std::runtime_error("Priority queue is empty");
     }
 
     return shortSequence_->accessLast()->data_.data_;
@@ -465,16 +443,16 @@ template <typename P, typename T> T &TwoLists<P, T>::peek() {
 
 template <typename P, typename T> T TwoLists<P, T>::pop() {
     if (isEmpty()) {
-        throw std::runtime_error("Priority queue is empty!");
+        throw std::runtime_error("Priority queue is empty");
     }
 
     T result = shortSequence_->accessLast()->data_.data_;
     shortSequence_->removeLast();
 
-    if (shortSequence_->size() == 0 && longSequence_->size() > 0) {
-        amt::SinglyLS<PQItem<P, T>> *originalLongSequence = longSequence_;
-        longSequence_ = new amt::SinglyLS<PQItem<P, T>>();
-        shortSequence_->changeCapacity(ceil(sqrt(originalLongSequence->size())));
+    if (shortSequence_->isEmpty() && !longSequence_->isEmpty()) {
+        LongSequenceType *originalLongSequence = longSequence_;
+        longSequence_ = new LongSequenceType;
+        shortSequence_->reserveCapacity(std::ceil(std::sqrt(originalLongSequence->size())));
 
         while (!originalLongSequence->isEmpty()) {
             LongSequenceBlockType *block = originalLongSequence->accessFirst();
@@ -500,22 +478,24 @@ template <typename P, typename T> inline bool BinaryHeap<P, T>::equals(const ADT
 }
 
 template <typename P, typename T> void BinaryHeap<P, T>::push(P priority, T data) {
-    PQItem<P, T> *dataFront = &(this->getHierarchy()->insertLastLeaf().data_);
-    dataFront->priority_ = priority;
-    dataFront->data_ = data;
+    PQItem<P, T> &queueData = this->getHierarchy()->insertLastLeaf().data_;
+    queueData.priority_ = priority;
+    queueData.data_ = data;
 
-    auto *currentNode = this->getHierarchy()->accessLastLeaf();
-    auto *parentNode = this->getHierarchy()->accessParent(*currentNode);
+    HierarchyBlockType *currentBlock = this->getHierarchy()->accessLastLeaf();
+    HierarchyBlockType *blockParent = this->getHierarchy()->accessParent(*currentBlock);
 
-    while (parentNode != nullptr && currentNode->data_.priority_ < parentNode->data_.priority_) {
-        std::swap(currentNode->data_, parentNode->data_);
-        currentNode = parentNode;
-        parentNode = this->getHierarchy()->accessParent(*currentNode);
+    while (blockParent != nullptr && currentBlock->data_.priority_ < blockParent->data_.priority_) {
+        using std::swap;
+        swap(currentBlock->data_, blockParent->data_);
+
+        currentBlock = blockParent;
+        blockParent = this->getHierarchy()->accessParent(*currentBlock);
     }
 }
 
 template <typename P, typename T> T &BinaryHeap<P, T>::peek() {
-    if (getHierarchy()->isEmpty()) {
+    if (this->isEmpty()) {
         throw std::out_of_range("Queue is empty!");
     }
 
@@ -523,31 +503,35 @@ template <typename P, typename T> T &BinaryHeap<P, T>::peek() {
 }
 
 template <typename P, typename T> T BinaryHeap<P, T>::pop() {
-    if (this->getHierarchy()->isEmpty()) {
-        throw std::out_of_range("Priority queue is empty!");
+    if (this->isEmpty()) {
+        throw std::out_of_range("Queue is empty!");
     }
 
-    auto *currentNode = this->getHierarchy()->accessRoot();
-    T result = currentNode->data_.data_;
-    std::swap(currentNode->data_, this->getHierarchy()->accessLastLeaf()->data_);
+    HierarchyBlockType *currentBlock = this->getHierarchy()->accessRoot();
+
+    T result = currentBlock->data_.data_;
+    using std::swap;
+    swap(currentBlock->data_, this->getHierarchy()->accessLastLeaf()->data_);
     this->getHierarchy()->removeLastLeaf();
 
-    if (!this->getHierarchy()->isEmpty()) {
-        auto findHigherPriorityChild = [&](auto *parentNode) {
-            auto *leftChild = this->getHierarchy()->accessLeftSon(*parentNode);
-            auto *rightChild = this->getHierarchy()->accessRightSon(*parentNode);
-            if (rightChild == nullptr || leftChild->data_.priority_ < rightChild->data_.priority_) {
-                return leftChild;
-            } else {
-                return rightChild;
-            }
+    if (!this->isEmpty()) {
+        std::function<HierarchyBlockType *(HierarchyBlockType *)> findSonWithHigherPriority;
+        findSonWithHigherPriority = [this](HierarchyBlockType *blockParent) {
+            HierarchyBlockType *leftSon = this->getHierarchy()->accessLeftSon(*blockParent);
+            HierarchyBlockType *rightSon = this->getHierarchy()->accessRightSon(*blockParent);
+
+            return rightSon == nullptr || leftSon->data_.priority_ < rightSon->data_.priority_
+                       ? leftSon
+                       : rightSon;
         };
 
-        auto *childNode = findHigherPriorityChild(currentNode);
-        while (childNode != nullptr && currentNode->data_.priority_ > childNode->data_.priority_) {
-            std::swap(currentNode->data_, childNode->data_);
-            currentNode = childNode;
-            childNode = findHigherPriorityChild(currentNode);
+        HierarchyBlockType *sonBlock = findSonWithHigherPriority(currentBlock);
+
+        while (sonBlock != nullptr && currentBlock->data_.priority_ > sonBlock->data_.priority_) {
+            swap(currentBlock->data_, sonBlock->data_);
+
+            currentBlock = sonBlock;
+            sonBlock = findSonWithHigherPriority(currentBlock);
         }
     }
 
@@ -557,4 +541,5 @@ template <typename P, typename T> T BinaryHeap<P, T>::pop() {
 template <typename P, typename T> amt::BinaryIH<PQItem<P, T>> *BinaryHeap<P, T>::getHierarchy() {
     return dynamic_cast<amt::BinaryIH<PQItem<P, T>> *>(this->memoryStructure_);
 }
+
 } // namespace ds::adt
