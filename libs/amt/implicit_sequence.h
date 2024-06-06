@@ -1,8 +1,8 @@
 #pragma once
 
-#include "libs/amt/abstract_memory_type.h"
-#include "libs/amt/sequence.h"
-#include "libs/constants.h"
+#include "abstract_memory_type.h"
+#include "sequence.h"
+#include "../constants.h"
 
 namespace ds::amt {
 template <typename DataType>
