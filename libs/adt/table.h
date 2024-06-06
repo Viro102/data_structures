@@ -145,19 +145,6 @@ class HashTable : public Table<K, T>, public AUMS<TableItem<K, T>> {
 
     void insert(const K &key, T data) override;
     bool tryFind(const K &key, T *&data) const override;
-    ds::amt::ImplicitSequence<T> findRegex(const std::string &pattern) {
-        ds::amt::ImplicitSequence<T> matched;
-        std::regex regex_pattern(pattern);
-        std::vector<T> matchedKeys;
-
-        for (const auto &pair : *this) {
-            if (std::regex_match(pair.key_, regex_pattern)) {
-                matched.insertLast(pair.data_);
-            }
-        }
-
-        return matched;
-    }
     T remove(const K &key) override;
 
   private:
@@ -182,6 +169,8 @@ class HashTable : public Table<K, T>, public AUMS<TableItem<K, T>> {
         bool operator==(const HashTableIterator &other) const;
         bool operator!=(const HashTableIterator &other) const;
         TableItem<K, T> &operator*();
+
+        using value_type = T;
 
       private:
         PrimaryRegionIterator *tablesCurrent_;
