@@ -4,3 +4,4 @@
 build*
 cmake-*
 out
+valgrind_output*
