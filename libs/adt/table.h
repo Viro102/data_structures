@@ -170,7 +170,7 @@ class HashTable : public Table<K, T>, public AUMS<TableItem<K, T>> {
         bool operator!=(const HashTableIterator &other) const;
         TableItem<K, T> &operator*();
 
-        using value_type = T;
+        using value_type = TableItem<K, T>;
 
       private:
         PrimaryRegionIterator *tablesCurrent_;
